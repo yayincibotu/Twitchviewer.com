@@ -1,6 +1,20 @@
-# Allow all web crawlers
 User-agent: *
 Allow: /
 
-# Sitemap location
+# SEO'yu iyileştirmek için sitemap
 Sitemap: https://twitchviewer.com/sitemap.xml
+
+# Spesifik crawlerlar için kurallar
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Crawl edilmemesi gereken özel alanlar
+Disallow: /api/
+Disallow: /admin/
+Disallow: /internal/
+Disallow: /*.json$
