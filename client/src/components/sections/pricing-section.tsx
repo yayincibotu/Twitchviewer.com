@@ -13,20 +13,18 @@ export default function PricingSection({ simplified = false }: PricingSectionPro
   const [, setLocation] = useLocation();
   
   // Fetch packages from API
-  const { data: packages, isLoading } = useQuery({
+  const { data: packages, isLoading } = useQuery<any[]>({
     queryKey: ['/api/packages'],
   });
 
-  const handleSubscribe = (stripePriceId: string) => {
+  const handleSubscribe = (packageId: number) => {
     if (!user) {
       setLocation("/auth");
       return;
     }
     
-    // In a real app with Stripe fully integrated, this would redirect to Stripe checkout
-    // But for now we'll just log and redirect to dashboard to simulate the flow
-    console.log(`Subscribe to package with Stripe Price ID: ${stripePriceId}`);
-    setLocation("/dashboard");
+    // Redirect to checkout page with the package ID
+    setLocation(`/checkout/${packageId}`);
   };
 
   if (isLoading) {
@@ -56,7 +54,7 @@ export default function PricingSection({ simplified = false }: PricingSectionPro
         )}
 
         <div className="mt-16 grid gap-8 lg:grid-cols-3">
-          {packages?.map((pkg: any, index: number) => (
+          {packages && packages.length > 0 ? packages.map((pkg: any, index: number) => (
             <div 
               key={pkg.id} 
               className={`bg-white rounded-xl overflow-hidden border ${index === 1 ? 'border-2 border-primary shadow-xl' : 'border-neutral-200 hover:border-primary/30'} transition-colors duration-300 hover:shadow-xl`}
@@ -93,7 +91,7 @@ export default function PricingSection({ simplified = false }: PricingSectionPro
               </div>
               <div className="p-6 bg-neutral-50 border-t border-neutral-200">
                 <Button 
-                  onClick={() => handleSubscribe(pkg.stripePriceId)}
+                  onClick={() => handleSubscribe(pkg.id)}
                   className={`w-full py-3 px-4 rounded-lg text-center font-medium ${
                     index === 1 
                       ? 'bg-primary hover:bg-primary-dark text-white transition-colors duration-200 shadow-lg shadow-primary/30' 
@@ -104,7 +102,11 @@ export default function PricingSection({ simplified = false }: PricingSectionPro
                 </Button>
               </div>
             </div>
-          ))}
+          )) : (
+            <div className="col-span-3 text-center py-12">
+              <p className="text-neutral-600">No pricing packages available</p>
+            </div>
+          )}
         </div>
 
         <div className="mt-12 text-center">

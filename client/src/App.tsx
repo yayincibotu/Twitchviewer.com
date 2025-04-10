@@ -9,6 +9,7 @@ import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
 import AdminDashboard from "@/pages/admin-dashboard";
+import CheckoutPage from "@/pages/checkout";
 
 function Router() {
   return (
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/auth" component={AuthPage} />
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
       <ProtectedRoute path="/admin" component={AdminDashboard} requireAdmin />
+      <ProtectedRoute path="/checkout/:packageId" component={CheckoutPage} />
       <Route component={NotFound} />
     </Switch>
   );
