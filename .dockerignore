@@ -1,0 +1,36 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+.DS_Store
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Build çıktıları (imaj oluşturulurken yeniden derlenecek)
+dist
+build
+.cache
+
+# Log dosyaları
+logs
+*.log
+
+# Geçici dosyalar
+tmp
+temp
+
+# IDE/Editor klasörleri
+.idea
+.vscode
+*.swp
+*.swo
+
+# Diğer
+.dockerignore
+Dockerfile
+docker-compose.yml
+README.md
+LICENSE
