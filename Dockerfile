@@ -1,4 +1,4 @@
-FROM node:20-alpine as builder
+FROM --platform=$BUILDPLATFORM node:20-alpine as builder
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ COPY . .
 RUN npm run build
 
 # Üretim aşaması
-FROM node:20-alpine as production
+FROM --platform=$TARGETPLATFORM node:20-alpine as production
 
 WORKDIR /app
 
