@@ -36,3 +36,8 @@ jobs:
         with:
           script_id: 22678
           file: "npm install"
+          - name: Deploy Script to Bunny Edge Scripting
+  uses: BunnyWay/actions/deploy-script@main
+  with:
+    script_id: 22678
+    file: "script.ts"
