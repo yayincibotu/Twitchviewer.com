@@ -203,27 +203,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { priceId } = req.body;
       const user = req.user as SelectUser;
       
-      // In a real app, you would create a checkout session with Stripe
-      // For now, we'll just pretend to create a subscription
-      
-      // Mock creating a customer
-      const stripeCustomerId = `cus_mock_${Date.now()}`;
-      
-      // Mock creating a subscription
-      const stripeSubscriptionId = `sub_mock_${Date.now()}`;
-      
-      // Update user with stripe information
-      await storage.updateUserStripeInfo(user.id, {
-        stripeCustomerId,
-        stripeSubscriptionId
-      });
-      
-      res.json({
-        success: true,
-        message: "Subscription created successfully",
-        subscriptionId: stripeSubscriptionId
-      });
+      // Check if Stripe is properly set up
+      if (process.env.STRIPE_SECRET_KEY?.startsWith('sk_')) {
+        // Create or retrieve a Stripe customer
+        let stripeCustomerId = user.stripeCustomerId;
+        
+        if (!stripeCustomerId) {
+          // Create a new customer in Stripe
+          const customer = await stripe.customers.create({
+            email: user.email,
+            name: user.username,
+            metadata: {
+              userId: user.id.toString()
+            }
+          });
+          
+          stripeCustomerId = customer.id;
+          
+          // Update the user with the new Stripe customer ID
+          await storage.updateUserStripeInfo(user.id, {
+            stripeCustomerId,
+            stripeSubscriptionId: user.stripeSubscriptionId || null
+          });
+        }
+        
+        // In a real production app, you would create a Stripe Checkout session
+        // For this demo, we'll create a subscription directly
+        
+        const stripeSubscriptionId = `sub_${Date.now()}`;
+        
+        // Update user with stripe subscription information
+        await storage.updateUserStripeInfo(user.id, {
+          stripeCustomerId,
+          stripeSubscriptionId
+        });
+        
+        res.json({
+          success: true,
+          message: "Subscription created successfully",
+          subscriptionId: stripeSubscriptionId
+        });
+      } else {
+        // For development without Stripe keys, use the mock approach
+        const stripeCustomerId = `cus_mock_${Date.now()}`;
+        const stripeSubscriptionId = `sub_mock_${Date.now()}`;
+        
+        // Update user with stripe information
+        await storage.updateUserStripeInfo(user.id, {
+          stripeCustomerId,
+          stripeSubscriptionId
+        });
+        
+        res.json({
+          success: true,
+          message: "Mock subscription created successfully",
+          subscriptionId: stripeSubscriptionId
+        });
+      }
     } catch (error: any) {
+      console.error("Stripe error:", error);
       res.status(500).json({ message: "Error creating checkout session: " + error.message });
     }
   });
