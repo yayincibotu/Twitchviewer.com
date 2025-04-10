@@ -3,6 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    
+    <!-- Performans optimizasyonları -->
+    <!-- DNS ön çözümleme -->
+    <link rel="dns-prefetch" href="https://twitchviewer-i1qvb.b-cdn.net" />
+    <link rel="dns-prefetch" href="https://api.stripe.com" />
+    <link rel="dns-prefetch" href="https://js.stripe.com" />
+    
+    <!-- Önceden bağlantı -->
+    <link rel="preconnect" href="https://twitchviewer-i1qvb.b-cdn.net" />
+    <link rel="preconnect" href="https://api.stripe.com" crossorigin />
+    
+    <!-- Kritik CSS için önceden yükleme -->
+    <link rel="preload" href="/src/index.css" as="style" />
+    
+    <!-- Önemli fontlar için önceden yükleme -->
+    <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin />
+    
+    <!-- Prefetch - kullanıcıların muhtemelen ziyaret edeceği sayfalar -->
+    <link rel="prefetch" href="/src/pages/auth-page.tsx" as="script" />
+    
+    <!-- Meta etiketleri -->
+    <meta name="description" content="TwitchViewer.com - Twitch izlenme istatistiklerinizi artırın ve hesabınızı büyütün" />
+    <meta name="keywords" content="Twitch, viewer, bot, stream, yayın, izleyici, büyüme, hesap" />
+    <meta name="author" content="TwitchViewer.com" />
+    
+    <!-- Hızlı yükleme için varsayılan tema rengi -->
+    <meta name="theme-color" content="#6d28d9" />
+    
+    <!-- Open Graph / Sosyal Medya -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="TwitchViewer.com - Twitch İzlenme Hizmetleri" />
+    <meta property="og:description" content="Twitch hesabınız için güvenilir ve etkili izleyici artırma hizmetleri. Yayınlarınızı büyütün!" />
+    <meta property="og:url" content="https://twitchviewer.com" />
+    
+    <!-- Twitter Kartı -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TwitchViewer.com - Twitch İzlenme Hizmetleri" />
+    <meta name="twitter:description" content="Twitch hesabınız için güvenilir ve etkili izleyici artırma hizmetleri. Yayınlarınızı büyütün!" />
+    
+    <title>TwitchViewer.com - Twitch İzlenme Hizmetleri</title>
   </head>
   <body>
     <div id="root"></div>

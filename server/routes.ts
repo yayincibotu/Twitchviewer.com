@@ -1,5 +1,6 @@
 import type { Express } from "express";
-import { createServer, type Server } from "http";
+import { createServer as createHttpServer, type Server } from "http";
+import { createServer as createHttp2Server } from "http2";
 import Stripe from "stripe";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
@@ -397,7 +398,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
+  // Geliştirme ortamında HTTP, prodüksiyonda HTTP/2 kullan
+  let httpServer: Server;
+  
+  if (process.env.NODE_ENV === 'production') {
+    // Prodüksiyonda HTTPS/HTTP2 kullan (gerçek uygulamada sertifikalar eklenmelidir)
+    console.log('Running server in production mode with HTTP/2 support');
+    // Not: Gerçek bir uygulamada burada sertifikalar eklenmelidir
+    // Bu örnek için basit HTTP2 destekli sunucu kullanıyoruz
+    // Not: HTTP/2 sunucusu için gerekli sertifikalar prodüksiyonda sağlanmalıdır
+    httpServer = createHttp2Server();
+    
+    // Express uygulamasını HTTP/2 sunucuya bağla
+    // @ts-ignore - HTTP/2 sunucusu tipini Express nasıl kullanmalı
+    httpServer.on('request', app);
+  } else {
+    // Geliştirme ortamında HTTP/1.1 kullan
+    console.log('Running server in development mode with HTTP/1.1');
+    httpServer = createHttpServer(app);
+  }
 
   return httpServer;
 }

@@ -4,6 +4,38 @@ import { setupVite, serveStatic, log } from "./vite";
 import compression from "compression";
 
 const app = express();
+
+// Güvenlik başlıkları
+app.use((req, res, next) => {
+  // Güvenlik başlıkları ekle
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  
+  // Strict Transport Security
+  if (process.env.NODE_ENV === 'production') {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  }
+  
+  // Referrer politikası
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  // Content Security Policy
+  res.setHeader('Content-Security-Policy', 
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' https://js.stripe.com; " +
+    "style-src 'self' 'unsafe-inline'; " +
+    "img-src 'self' data: https://twitchviewer-i1qvb.b-cdn.net; " +
+    "font-src 'self'; " +
+    "connect-src 'self' https://api.stripe.com; " +
+    "frame-src https://js.stripe.com; " +
+    "object-src 'none'; " +
+    "base-uri 'self';"
+  );
+  
+  next();
+});
+
 // Gzip/Brotli sıkıştırma yapılandırması - agresif sıkıştırma seviyesi ile 
 app.use(compression({
   level: 6, // Sıkıştırma seviyesi (0-9)
@@ -65,9 +97,22 @@ app.use((req, res, next) => {
   app.use(express.static('client/public', {
     maxAge: '1y',
     setHeaders: (res, path) => {
+      // Statik varlıklar için agresif önbelleğe alma (1 yıl)
       if (path.endsWith('.js') || path.endsWith('.css') || 
-          path.endsWith('.webp') || path.endsWith('.woff2')) {
-        res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 yıl
+          path.endsWith('.webp') || path.endsWith('.woff2') ||
+          path.endsWith('.png') || path.endsWith('.jpg') || 
+          path.endsWith('.jpeg') || path.endsWith('.svg') ||
+          path.endsWith('.ico') || path.endsWith('.ttf')) {
+        // Immutable flag güçlü önbelleğe alma için eklendi
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      } else {
+        // Diğer dosyalar için daha kısa süre (1 hafta)
+        res.setHeader('Cache-Control', 'public, max-age=604800');
+      }
+      
+      // Resim dosyaları için content-type ve boyut optimizasyonları
+      if (path.endsWith('.webp')) {
+        res.setHeader('Content-Type', 'image/webp');
       }
     }
   }));
