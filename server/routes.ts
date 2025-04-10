@@ -13,6 +13,15 @@ interface CacheEntry {
 
 const cache = new Map<string, CacheEntry>();
 
+// Belirli bir önbellek anahtarını veya tüm önbelleği temizle
+function clearCache(key?: string) {
+  if (key) {
+    cache.delete(key);
+  } else {
+    cache.clear();
+  }
+}
+
 // Önbelleğe alma middleware'i
 function cacheMiddleware(ttl = 60000) { // Varsayılan olarak 1 dakika
   return (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
@@ -115,8 +124,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ----- Package Routes -----
   
-  // Get all packages
-  app.get("/api/packages", async (req, res) => {
+  // Get all packages (5 dakika önbellekleme)
+  app.get("/api/packages", cacheMiddleware(300000), async (req, res) => {
     try {
       const packages = await storage.getPackages();
       res.json(packages);
@@ -145,6 +154,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/packages", checkIsAdmin, async (req, res) => {
     try {
       const newPackage = await storage.createPackage(req.body);
+      // Paketler önbelleğini temizle, böylece kullanıcılar yeni paketi görebilir
+      clearCache('/api/packages');
       res.status(201).json(newPackage);
     } catch (error: any) {
       res.status(500).json({ message: "Error creating package: " + error.message });
@@ -160,6 +171,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updatedPackage) {
         return res.status(404).json({ message: "Package not found" });
       }
+      
+      // Paketler önbelleğini temizle
+      clearCache('/api/packages');
+      // Ayrıca spesifik paket önbelleğini de temizle
+      clearCache(`/api/packages/${packageId}`);
       
       res.json(updatedPackage);
     } catch (error: any) {
@@ -177,6 +193,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Package not found" });
       }
       
+      // Paketler önbelleğini temizle
+      clearCache('/api/packages');
+      // Ayrıca silinen pakete ait önbelleği de temizle
+      clearCache(`/api/packages/${packageId}`);
+      
       res.status(204).end();
     } catch (error: any) {
       res.status(500).json({ message: "Error deleting package: " + error.message });
@@ -185,8 +206,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ----- SEO Settings Routes -----
   
-  // Get SEO settings for a page
-  app.get("/api/seo/:pageSlug", async (req, res) => {
+  // Get SEO settings for a page (30 dakika önbellekleme)
+  app.get("/api/seo/:pageSlug", cacheMiddleware(1800000), async (req, res) => {
     try {
       const pageSlug = req.params.pageSlug;
       const seoSettings = await storage.getSeoSettings(pageSlug);
@@ -215,6 +236,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/seo", checkIsAdmin, async (req, res) => {
     try {
       const newSettings = await storage.createSeoSettings(req.body);
+      
+      // SEO önbelleğini temizle
+      clearCache(`/api/seo/${newSettings.pageSlug}`);
+      
+      // Sitemap önbelleğini de temizle
+      clearCache('/sitemap.xml');
+      
       res.status(201).json(newSettings);
     } catch (error: any) {
       res.status(500).json({ message: "Error creating SEO settings: " + error.message });
@@ -230,6 +258,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updatedSettings) {
         return res.status(404).json({ message: "SEO settings not found" });
       }
+      
+      // İlgili SEO ayarlarının önbelleğini temizle
+      clearCache(`/api/seo/${updatedSettings.pageSlug}`);
+      
+      // Sitemap önbelleğini de temizle
+      clearCache('/sitemap.xml');
       
       res.json(updatedSettings);
     } catch (error: any) {
@@ -322,8 +356,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(200).send('ok');
   });
 
-  // Generate XML sitemap
-  app.get("/sitemap.xml", async (req, res) => {
+  // Generate XML sitemap (1 gün önbellekleme)
+  app.get("/sitemap.xml", cacheMiddleware(86400000), async (req, res) => {
     try {
       const seoSettings = await storage.getAllSeoSettings();
       const baseUrl = req.protocol + '://' + req.get('host');
