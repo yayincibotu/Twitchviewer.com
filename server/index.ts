@@ -1,8 +1,22 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import compression from "compression";
 
 const app = express();
+// Gzip/Brotli sıkıştırma yapılandırması - agresif sıkıştırma seviyesi ile 
+app.use(compression({
+  level: 6, // Sıkıştırma seviyesi (0-9)
+  threshold: 0, // Sıkıştırmanın uygulanacağı minimum boyut
+  filter: (req, res) => {
+    // Statik dosyalar, API yanıtları vb. için sıkıştırma uygulayın
+    // WebSocket veya event-stream yanıtları için uygulamayın
+    if (req.headers['accept-encoding']?.includes('gzip')) {
+      return true;
+    }
+    return compression.filter(req, res);
+  }
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -47,8 +61,16 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // Serve static files from client/public directory
-  app.use(express.static('client/public'));
+  // Serve static files from client/public directory with cache headers
+  app.use(express.static('client/public', {
+    maxAge: '1y',
+    setHeaders: (res, path) => {
+      if (path.endsWith('.js') || path.endsWith('.css') || 
+          path.endsWith('.webp') || path.endsWith('.woff2')) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 yıl
+      }
+    }
+  }));
   
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route

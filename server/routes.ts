@@ -5,6 +5,52 @@ import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
 
+// Önbelleğe alma için basit bir mekanizma
+interface CacheEntry {
+  data: any;
+  expires: number;
+}
+
+const cache = new Map<string, CacheEntry>();
+
+// Önbelleğe alma middleware'i
+function cacheMiddleware(ttl = 60000) { // Varsayılan olarak 1 dakika
+  return (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
+    // Sadece GET istekleri için önbelleğe alın
+    if (req.method !== 'GET') {
+      return next();
+    }
+    
+    // Kullanıcıya özel içerik için önbelleğe almayın
+    if (req.isAuthenticated()) {
+      return next();
+    }
+
+    const key = req.originalUrl;
+    const cachedResponse = cache.get(key);
+    
+    if (cachedResponse && cachedResponse.expires > Date.now()) {
+      // Önbellekten yanıt verin
+      return res.json(cachedResponse.data);
+    }
+    
+    // Orijinal json metodunu yakala
+    const originalJson = res.json;
+    res.json = function(body) {
+      // Yanıtı önbelleğe al
+      cache.set(key, {
+        data: body,
+        expires: Date.now() + ttl
+      });
+      
+      // Orijinal yanıtı döndür
+      return originalJson.call(this, body);
+    };
+    
+    next();
+  };
+};
+
 function checkIsAdmin(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ message: "Not authenticated" });
@@ -264,6 +310,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Stripe error:", error);
       res.status(500).json({ message: "Error creating checkout session: " + error.message });
     }
+  });
+
+  // Metrics API endpoint for Web Vitals
+  app.post("/api/metrics", (req, res) => {
+    // Gerçek bir uygulamada bu verileri bir analitik sistemine kaydedersiniz
+    // Şimdilik sadece logluyoruz
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Web Vitals Metrics:', req.body);
+    }
+    res.status(200).send('ok');
   });
 
   // Generate XML sitemap
