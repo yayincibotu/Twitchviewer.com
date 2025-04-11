@@ -101,9 +101,9 @@ export default function LimitedTimeOfferBanner() {
   return (
     <div className="bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 relative overflow-hidden">
       {/* Background effect */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -left-4 -top-4 w-24 h-24 rounded-full bg-white opacity-10 animate-pulse"></div>
-        <div className="absolute right-10 bottom-0 w-16 h-16 rounded-full bg-white opacity-10 animate-pulse delay-300"></div>
+      <div className="absolute inset-0 overflow-hidden h-12 top-1/2 -translate-y-1/2">
+        <div className="absolute -left-4 top-0 w-12 h-12 rounded-full bg-white opacity-10 animate-pulse"></div>
+        <div className="absolute right-10 top-0 w-8 h-8 rounded-full bg-white opacity-10 animate-pulse delay-300"></div>
       </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
