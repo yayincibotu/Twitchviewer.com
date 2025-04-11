@@ -54,18 +54,23 @@ export const TurnstileWidget = forwardRef<HTMLDivElement, TurnstileProps>(
       }
     };
 
+    const handleError = (error: string) => {
+      if (onError) {
+        onError(error);
+      }
+    };
+
     return (
       <div ref={ref} className={className} {...props}>
         <Turnstile
           key={key}
           turnstileSiteKey={TURNSTILE_SITE_KEY}
           callback={handleVerify}
-          onExpire={handleExpire}
-          onError={onError}
+          expiredCallback={handleExpire}
+          errorCallback={handleError}
           id={id}
           theme="auto"
           className="mt-2"
-          ref={turnstileRef}
         />
       </div>
     );

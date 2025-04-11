@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { Helmet } from "react-helmet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SiTwitch } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
+import { TurnstileWidget } from "@/components/ui/turnstile";
 
 
 
@@ -26,6 +27,7 @@ const loginSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   remember: z.boolean().optional(),
+  turnstileToken: z.string().min(1, "Please complete the Turnstile verification"),
 });
 
 export default function AuthPage() {
@@ -70,6 +72,7 @@ export default function AuthPage() {
       username: "",
       password: "",
       remember: false,
+      turnstileToken: "",
     },
   });
   
@@ -81,6 +84,7 @@ export default function AuthPage() {
       email: "",
       password: "",
       confirmPassword: "",
+      turnstileToken: "",
     },
   });
   
@@ -89,6 +93,7 @@ export default function AuthPage() {
     resolver: zodResolver(passwordResetRequestSchema),
     defaultValues: {
       email: "",
+      turnstileToken: "",
     },
   });
   
