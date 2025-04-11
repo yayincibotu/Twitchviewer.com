@@ -11,6 +11,12 @@ export const users = pgTable("users", {
   role: text("role").notNull().default("user"),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
+  passwordResetToken: text("password_reset_token"),
+  passwordResetExpires: timestamp("password_reset_expires"),
+  twitchId: text("twitch_id"),
+  twitchAccessToken: text("twitch_access_token"),
+  twitchRefreshToken: text("twitch_refresh_token"),
+  rememberedSession: boolean("remembered_session").default(false),
 });
 
 export const packages = pgTable("packages", {

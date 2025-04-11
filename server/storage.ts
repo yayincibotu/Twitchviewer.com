@@ -20,10 +20,16 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByTwitchId(twitchId: string): Promise<User | undefined>;
+  getUserByPasswordResetToken(token: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   verifyUserEmail(id: number): Promise<User | undefined>;
   updateUserRole(id: number, role: string): Promise<User | undefined>;
   updateUserStripeInfo(id: number, stripeInfo: { stripeCustomerId: string, stripeSubscriptionId: string }): Promise<User | undefined>;
+  setPasswordResetToken(email: string): Promise<{ token: string, expires: Date } | undefined>;
+  resetPassword(token: string, newPassword: string): Promise<User | undefined>;
+  createOrUpdateTwitchUser(twitchData: { twitchId: string, username: string, email: string, accessToken: string, refreshToken: string }): Promise<User>;
+  updateRememberedSession(id: number, remembered: boolean): Promise<User | undefined>;
   
   // Package operations
   getPackages(): Promise<Package[]>;
