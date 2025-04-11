@@ -5,10 +5,21 @@ export default {
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter var', 'Inter', 'sans-serif'],
+        heading: ['Outfit', 'sans-serif'],
+      },
+      boxShadow: {
+        'soft': '0 2px 10px rgba(0, 0, 0, 0.05)',
+        'elevated': '0 10px 30px -5px rgba(0, 0, 0, 0.1)',
+        'button': '0 4px 6px -1px rgba(67, 97, 238, 0.2)',
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        'xl': '1rem',
+        '2xl': '1.5rem',
       },
       colors: {
         background: "hsl(var(--background))",
@@ -79,10 +90,50 @@ export default {
             height: "0",
           },
         },
+        "fade-in": {
+          from: {
+            opacity: "0",
+          },
+          to: {
+            opacity: "1",
+          },
+        },
+        "fade-out": {
+          from: {
+            opacity: "1",
+          },
+          to: {
+            opacity: "0",
+          },
+        },
+        "slide-up": {
+          from: {
+            transform: "translateY(10px)",
+            opacity: "0",
+          },
+          to: {
+            transform: "translateY(0)",
+            opacity: "1",
+          },
+        },
+        "slide-down": {
+          from: {
+            transform: "translateY(-10px)",
+            opacity: "0", 
+          },
+          to: {
+            transform: "translateY(0)",
+            opacity: "1",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.3s ease-out",
+        "fade-out": "fade-out 0.3s ease-out",
+        "slide-up": "slide-up 0.4s ease-out",
+        "slide-down": "slide-down 0.4s ease-out",
       },
     },
   },
