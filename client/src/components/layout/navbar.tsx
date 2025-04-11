@@ -54,23 +54,29 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <nav className="hidden md:ml-6 md:flex md:space-x-8">
             <Link href="/">
-              <a className={`inline-flex items-center px-1 pt-1 border-b-2 ${
+              <div className={`inline-flex items-center px-1 pt-1 border-b-2 ${
                 isActivePath("/") && !isActivePath("/auth") && !isActivePath("/dashboard") && !isActivePath("/admin")
                   ? "border-primary text-neutral-800"
                   : "border-transparent text-neutral-600 hover:text-neutral-800 hover:border-neutral-300"
               } text-sm font-medium transition`}>
                 Home
-              </a>
+              </div>
             </Link>
-            <a href="/#features" className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-neutral-600 hover:text-neutral-800 hover:border-neutral-300 transition">
-              Features
-            </a>
-            <a href="/#pricing" className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-neutral-600 hover:text-neutral-800 hover:border-neutral-300 transition">
-              Pricing
-            </a>
-            <a href="/#contact" className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-neutral-600 hover:text-neutral-800 hover:border-neutral-300 transition">
-              Contact
-            </a>
+            <Link href="/#features">
+              <div className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-neutral-600 hover:text-neutral-800 hover:border-neutral-300 transition">
+                Features
+              </div>
+            </Link>
+            <Link href="/#pricing">
+              <div className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-neutral-600 hover:text-neutral-800 hover:border-neutral-300 transition">
+                Pricing
+              </div>
+            </Link>
+            <Link href="/#contact">
+              <div className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-neutral-600 hover:text-neutral-800 hover:border-neutral-300 transition">
+                Contact
+              </div>
+            </Link>
           </nav>
           
           {/* Auth Buttons (Desktop) */}
@@ -176,15 +182,15 @@ export default function Navbar() {
                   </div>
                   <div className="mt-3 space-y-1">
                     <Link href="/dashboard">
-                      <a className="block px-3 py-2 rounded-md text-base font-medium text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100">
+                      <div className="block px-3 py-2 rounded-md text-base font-medium text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100">
                         Dashboard
-                      </a>
+                      </div>
                     </Link>
                     {user.role === "admin" && (
                       <Link href="/admin">
-                        <a className="block px-3 py-2 rounded-md text-base font-medium text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100">
+                        <div className="block px-3 py-2 rounded-md text-base font-medium text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100">
                           Admin Panel
-                        </a>
+                        </div>
                       </Link>
                     )}
                     <button
@@ -199,14 +205,14 @@ export default function Navbar() {
             ) : (
               <div className="pt-4 pb-3 border-t border-neutral-200">
                 <Link href="/auth">
-                  <a className="block px-3 py-2 rounded-md text-base font-medium text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100">
+                  <div className="block px-3 py-2 rounded-md text-base font-medium text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100">
                     Sign in
-                  </a>
+                  </div>
                 </Link>
                 <Link href="/auth">
-                  <a className="block px-3 py-2 rounded-md text-base font-medium text-white bg-primary hover:bg-primary-dark my-2">
+                  <div className="block px-3 py-2 rounded-md text-base font-medium text-white bg-primary hover:bg-primary-dark my-2">
                     Sign up
-                  </a>
+                  </div>
                 </Link>
               </div>
             )}
