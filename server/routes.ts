@@ -112,6 +112,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get users count (admin only)
+  app.get("/api/users/count", checkIsAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users.length);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching users count: " + error.message });
+    }
+  });
+  
   // Get a single user (admin only)
   app.get("/api/users/:id", checkIsAdmin, async (req, res) => {
     try {

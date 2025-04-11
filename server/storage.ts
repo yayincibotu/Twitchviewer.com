@@ -118,6 +118,20 @@ export class MemStorage implements IStorage {
   private successStories: Map<number, SuccessStory>;
   private faqCategories: Map<number, FaqCategory>;
   private faqItems: Map<number, FaqItem>;
+  
+  // Add missing methods required by IStorage interface
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+  
+  async updateUser(id: number, userData: Partial<User>): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = { ...user, ...userData };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
   private blogPosts: Map<number, BlogPost>;
   private securityBadges: Map<number, SecurityBadge>;
   private limitedTimeOffers: Map<number, LimitedTimeOffer>;
