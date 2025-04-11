@@ -80,6 +80,88 @@
   100% { opacity: 1; }
 }
 
+/* Animasyonlar */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from { 
+    opacity: 0; 
+    transform: translateY(-20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleUp {
+  from { 
+    opacity: 0; 
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out forwards;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.6s ease-out forwards;
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.5s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+/* Hero Bölümü Desenleri */
+.hero-pattern {
+  background-image: radial-gradient(circle at 25px 25px, rgba(0, 0, 0, 0.1) 2%, transparent 0%),
+    radial-gradient(circle at 75px 75px, rgba(0, 0, 0, 0.05) 2%, transparent 0%);
+  background-size: 100px 100px;
+}
+
 img.lazyload, img.lazyloading {
   opacity: 0;
 }
@@ -102,12 +184,22 @@ a:focus-visible, button:focus-visible {
   
   /* Gradient Buton */
   .btn-gradient {
-    @apply relative overflow-hidden bg-primary text-white rounded-lg px-6 py-3 font-medium shadow-button transition-all duration-300 hover:shadow-lg;
+    @apply relative overflow-hidden text-white rounded-xl px-6 py-3 font-medium shadow-button transition-all duration-300 hover:shadow-lg;
     background: linear-gradient(90deg, hsl(228 76% 59%), hsl(270 76% 38%));
   }
   
   .btn-gradient:hover {
     background: linear-gradient(90deg, hsl(228 76% 54%), hsl(270 76% 33%));
+  }
+  
+  .btn-gradient::after {
+    content: '';
+    @apply absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300;
+    background: linear-gradient(90deg, hsl(270 76% 38%), hsl(228 76% 59%));
+  }
+  
+  .btn-gradient:hover::after {
+    @apply opacity-100;
   }
   
   /* Feature Card */
@@ -117,7 +209,7 @@ a:focus-visible, button:focus-visible {
   
   /* Icon Box */
   .icon-box {
-    @apply flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-4;
+    @apply flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-4;
   }
   
   /* Animated NavLink */
@@ -130,8 +222,12 @@ a:focus-visible, button:focus-visible {
     @apply absolute left-0 bottom-0 w-0 h-0.5 bg-primary transition-all duration-300;
   }
   
-  .nav-link:hover::after {
+  .nav-link:hover::after, .nav-link.active::after {
     @apply w-full;
+  }
+  
+  .nav-link.active {
+    @apply text-primary;
   }
   
   /* Skeleton Loading */
@@ -150,5 +246,18 @@ a:focus-visible, button:focus-visible {
   
   ::-webkit-scrollbar-thumb {
     @apply bg-neutral-300 rounded-full hover:bg-neutral-400 transition-colors;
+  }
+  
+  /* Shadows */
+  .shadow-soft {
+    box-shadow: 0 3px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .shadow-elevated {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), 0 10px 8px -5px rgba(0, 0, 0, 0.05);
+  }
+  
+  .shadow-button {
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
   }
 }

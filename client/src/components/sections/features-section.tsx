@@ -69,38 +69,22 @@ export default function FeaturesSection() {
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-fade-in');
-          }
-        });
-      },
-      {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.1,
-      }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    cardsRef.current.forEach((card) => {
-      if (card) observer.observe(card);
-    });
-
-    return () => {
+    // Sayfa yüklendiğinde oto-görünür hale getir
+    setTimeout(() => {
       if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
+        sectionRef.current.classList.remove('opacity-0');
+        sectionRef.current.classList.add('animate-fade-in');
       }
-      
-      cardsRef.current.forEach((card) => {
-        if (card) observer.unobserve(card);
+
+      cardsRef.current.forEach((card, index) => {
+        if (card) {
+          setTimeout(() => {
+            card.classList.remove('opacity-0');
+            card.classList.add('animate-fade-in');
+          }, 200 + index * 100);
+        }
       });
-    };
+    }, 500);
   }, []);
 
   return (
