@@ -17,19 +17,41 @@ type AuthContextType = {
   logoutMutation: UseMutationResult<void, Error, void>;
   registerMutation: UseMutationResult<Omit<SelectUser, "password">, Error, RegisterData>;
   verifyEmailMutation: UseMutationResult<Omit<SelectUser, "password">, Error, void>;
+  requestPasswordResetMutation: UseMutationResult<{message: string}, Error, PasswordResetRequestData>;
+  resetPasswordMutation: UseMutationResult<{message: string}, Error, ResetPasswordData>;
+  updateRememberSessionMutation: UseMutationResult<Omit<SelectUser, "password">, Error, {remember: boolean}>;
 };
 
 // Extended schema for registration form
 const registerSchema = insertUserSchema.extend({
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string(),
+  recaptchaToken: z.string().min(1, "Please complete the reCAPTCHA challenge"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
 });
 
+// Schema for password reset request
+const passwordResetRequestSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  recaptchaToken: z.string().min(1, "Please complete the reCAPTCHA challenge"),
+});
+
+// Schema for password reset with token
+const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Reset token is required"),
+  newPassword: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string(),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
 type RegisterData = z.infer<typeof registerSchema>;
-type LoginData = { username: string; password: string };
+type LoginData = { username: string; password: string; remember?: boolean; recaptchaToken?: string };
+type PasswordResetRequestData = z.infer<typeof passwordResetRequestSchema>;
+type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -129,6 +151,68 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
+  // Password reset request mutation
+  const requestPasswordResetMutation = useMutation({
+    mutationFn: async (data: PasswordResetRequestData) => {
+      const res = await apiRequest("POST", "/api/request-password-reset", data);
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Password Reset Requested",
+        description: data.message,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Password Reset Request Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Reset password mutation
+  const resetPasswordMutation = useMutation({
+    mutationFn: async (data: ResetPasswordData) => {
+      // Remove confirmPassword before sending to API
+      const { confirmPassword, ...resetData } = data;
+      const res = await apiRequest("POST", "/api/reset-password", resetData);
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Password Reset Successful",
+        description: data.message,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Password Reset Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Remember session mutation
+  const updateRememberSessionMutation = useMutation({
+    mutationFn: async (data: {remember: boolean}) => {
+      const res = await apiRequest("POST", "/api/remember-session", data);
+      return await res.json();
+    },
+    onSuccess: (user) => {
+      queryClient.setQueryData(["/api/user"], user);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Session Preference Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   return (
     <AuthContext.Provider
       value={{
@@ -139,6 +223,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logoutMutation,
         registerMutation,
         verifyEmailMutation,
+        requestPasswordResetMutation,
+        resetPasswordMutation,
+        updateRememberSessionMutation
       }}
     >
       {children}
@@ -155,4 +242,4 @@ export function useAuth() {
 }
 
 // Export schema for form validation
-export { registerSchema };
+export { registerSchema, passwordResetRequestSchema, resetPasswordSchema };

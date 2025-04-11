@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { Helmet } from "react-helmet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -9,14 +9,21 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useAuth, registerSchema } from "@/hooks/use-auth";
-import { Loader2 } from "lucide-react";
+import { useAuth, registerSchema, passwordResetRequestSchema, resetPasswordSchema } from "@/hooks/use-auth";
+import { Loader2, ArrowLeft, Check, LucideRocket } from "lucide-react";
+import ReCAPTCHA from "react-google-recaptcha";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
+import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { SiTwitch } from "react-icons/si";
 
 const loginSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  remember: z.boolean().optional(),
+  recaptchaToken: z.string().optional(),
 });
 
 export default function AuthPage() {
