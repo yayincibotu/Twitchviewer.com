@@ -1,6 +1,7 @@
-import { forwardRef, useId, useState, useEffect, useRef } from "react";
+import { forwardRef, useState } from "react";
 import Turnstile from "react-cloudflare-turnstile";
 
+// Basit arayüz tanımı
 interface TurnstileProps {
   onVerify: (token: string) => void;
   onExpire?: () => void;
@@ -8,46 +9,22 @@ interface TurnstileProps {
   className?: string;
 }
 
-// Debugging için site anahtarını logluyoruz
-console.log("Turnstile ENV Variables:", {
-  "VITE_TURNSTILE_SITE_KEY": import.meta.env.VITE_TURNSTILE_SITE_KEY,
-  "All ENV": import.meta.env
-});
+// Site anahtarını al
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
+// Basitleştirilmiş Turnstile bileşeni
 export const TurnstileWidget = forwardRef<HTMLDivElement, TurnstileProps>(
-  ({ onVerify, onExpire, onError, className, ...props }, ref) => {
-    const id = useId();
-    const [key, setKey] = useState(0);
-    const turnstileRef = useRef<any>(null);
+  ({ onVerify, onExpire, onError, className }, ref) => {
+    const [key] = useState(0);
 
-    // Konsola widget oluşturulduğunda log ekleyelim
-    useEffect(() => {
-      console.log("TurnstileWidget loaded for id:", id);
-      console.log("TURNSTILE_SITE_KEY present:", !!TURNSTILE_SITE_KEY);
-    }, [id]);
-
-    // Reset the component if needed
-    const reset = () => {
-      console.log("TurnstileWidget reset called");
-      setKey(prevKey => prevKey + 1);
-    };
-
-    // Expose the reset function to parent components
-    useEffect(() => {
-      if (ref && 'current' in ref) {
-        (ref as any).current = {
-          reset
-        };
-      }
-    }, [ref]);
+    console.log("Rendering TurnstileWidget with site key:", TURNSTILE_SITE_KEY ? "present" : "missing");
 
     if (!TURNSTILE_SITE_KEY) {
-      console.error("Turnstile site key is not configured. Please set VITE_TURNSTILE_SITE_KEY environment variable.");
+      console.error("Turnstile site key is not configured.");
       return (
         <div 
           ref={ref} 
-          className={`bg-red-50 border border-red-200 text-red-700 p-3 rounded-md my-2 ${className}`}
+          className={`bg-red-50 border border-red-200 text-red-700 p-3 rounded-md my-2 ${className || ''}`}
         >
           Turnstile configuration error. Please contact support.
         </div>
@@ -55,13 +32,13 @@ export const TurnstileWidget = forwardRef<HTMLDivElement, TurnstileProps>(
     }
 
     return (
-      <div ref={ref} className={`${className || ''}`} {...props}>
+      <div ref={ref} className={className}>
         <Turnstile
           key={key}
-          turnstileSiteKey={TURNSTILE_SITE_KEY}
-          callback={onVerify}
-          expiredCallback={onExpire || reset}
-          errorCallback={onError}
+          sitekey={TURNSTILE_SITE_KEY}
+          onSuccess={onVerify}
+          onExpire={onExpire}
+          onError={onError}
           theme="auto"
         />
       </div>
