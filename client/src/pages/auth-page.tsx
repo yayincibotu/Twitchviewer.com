@@ -371,32 +371,7 @@ export default function AuthPage() {
                             )}
                           />
                           
-                          <FormField
-                            control={registerForm.control}
-                            name="turnstileToken"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Security Verification</FormLabel>
-                                <FormControl>
-                                  <BasicTurnstile
-                                    onVerify={(token: string) => {
-                                      console.log("Turnstile register verification success, token length:", token?.length || 0);
-                                      field.onChange(token);
-                                    }}
-                                    onExpire={() => {
-                                      console.log("Turnstile register token expired");
-                                      field.onChange("");
-                                    }}
-                                    onError={(error: string) => {
-                                      console.error("Turnstile register error:", error);
-                                      field.onChange("");
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+{/* Turnstile devre dışı bırakıldı */}
                           
                           <Button 
                             type="submit" 
@@ -474,32 +449,7 @@ export default function AuthPage() {
                             )}
                           />
                           
-                          <FormField
-                            control={resetRequestForm.control}
-                            name="turnstileToken"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Security Verification</FormLabel>
-                                <FormControl>
-                                  <BasicTurnstile
-                                    onVerify={(token: string) => {
-                                      console.log("Turnstile reset verification success, token length:", token?.length || 0);
-                                      field.onChange(token);
-                                    }}
-                                    onExpire={() => {
-                                      console.log("Turnstile reset token expired");
-                                      field.onChange("");
-                                    }}
-                                    onError={(error: string) => {
-                                      console.error("Turnstile reset error:", error);
-                                      field.onChange("");
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+{/* Turnstile devre dışı bırakıldı */}
                           
                           <Button 
                             type="submit" 
