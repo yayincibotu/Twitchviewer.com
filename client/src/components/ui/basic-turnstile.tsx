@@ -1,5 +1,5 @@
-import React from 'react';
-import Turnstile from 'react-turnstile';
+import React, { useEffect, useRef } from 'react';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 interface BasicTurnstileProps {
   onVerify: (token: string) => void;
@@ -10,6 +10,7 @@ interface BasicTurnstileProps {
 
 export function BasicTurnstile({ onVerify, onExpire, onError, className }: BasicTurnstileProps) {
   const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY as string;
+  const containerRef = useRef<HTMLDivElement>(null);
   
   console.log("BasicTurnstile rendering with site key:", siteKey ? "present" : "missing");
   
@@ -23,13 +24,16 @@ export function BasicTurnstile({ onVerify, onExpire, onError, className }: Basic
   }
   
   return (
-    <div className={className}>
+    <div className={className} ref={containerRef}>
       <Turnstile
         sitekey={siteKey}
-        onVerify={onVerify}
+        onSuccess={onVerify}
         onExpire={onExpire}
         onError={onError}
-        theme="auto"
+        options={{
+          theme: 'auto',
+          size: 'normal'
+        }}
       />
     </div>
   );
