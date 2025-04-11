@@ -25,10 +25,10 @@ export function BasicTurnstile({ onVerify, onExpire, onError, className }: Basic
   return (
     <div className={className}>
       <Turnstile
-        sitekey={siteKey}
-        onSuccess={onVerify}
-        onExpire={onExpire}
-        onError={onError}
+        turnstileSiteKey={siteKey}
+        callback={onVerify}
+        expiredCallback={onExpire}
+        errorCallback={onError}
         theme="auto"
       />
     </div>

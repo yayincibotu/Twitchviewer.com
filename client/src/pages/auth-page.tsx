@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth, registerSchema, passwordResetRequestSchema, resetPasswordSchema } from "@/hooks/use-auth";
 import { Loader2, ArrowLeft, Check, LucideRocket } from "lucide-react";
-import { TurnstileWidget } from "@/components/ui/turnstile";
+import { BasicTurnstile } from "@/components/ui/basic-turnstile";
 
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
@@ -262,10 +262,10 @@ export default function AuthPage() {
                               <FormItem>
                                 <FormLabel>Security Verification</FormLabel>
                                 <FormControl>
-                                  {/* Hata ayıklama logları ekleyelim */}
+                                  {/* Yeni BasicTurnstile bileşenini kullan */}
                                   <div>
-                                    <TurnstileWidget
-                                      onVerify={(token) => {
+                                    <BasicTurnstile
+                                      onVerify={(token: string) => {
                                         console.log("Turnstile login verification success, token length:", token?.length || 0);
                                         field.onChange(token);
                                       }}
@@ -273,7 +273,7 @@ export default function AuthPage() {
                                         console.log("Turnstile login token expired");
                                         field.onChange("");
                                       }}
-                                      onError={(error) => {
+                                      onError={(error: string) => {
                                         console.error("Turnstile login error:", error);
                                         field.onChange("");
                                       }}
