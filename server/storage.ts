@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto";
 import { 
   users, type User, type InsertUser, 
   packages, type Package, type InsertPackage, 
@@ -472,6 +473,20 @@ By implementing these strategies consistently, you'll be well on your way to gro
       (user) => user.email.toLowerCase() === email.toLowerCase(),
     );
   }
+  
+  async getUserByTwitchId(twitchId: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.twitchId === twitchId,
+    );
+  }
+  
+  async getUserByPasswordResetToken(token: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.passwordResetToken === token && 
+      user.passwordResetExpires && 
+      new Date(user.passwordResetExpires) > new Date(),
+    );
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
@@ -481,7 +496,14 @@ By implementing these strategies consistently, you'll be well on your way to gro
       emailVerified: false, 
       role: "user",
       stripeCustomerId: null,
-      stripeSubscriptionId: null
+      stripeSubscriptionId: null,
+      passwordResetToken: null,
+      passwordResetExpires: null,
+      twitchId: null,
+      twitchAccessToken: null,
+      twitchRefreshToken: null,
+      rememberedSession: false,
+      createdAt: new Date()
     };
     this.users.set(id, user);
     return user;
@@ -510,6 +532,113 @@ By implementing these strategies consistently, you'll be well on your way to gro
     if (!user) return undefined;
     
     const updatedUser = { ...user, ...stripeInfo };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+  
+  async setPasswordResetToken(email: string): Promise<{ token: string, expires: Date } | undefined> {
+    const user = await this.getUserByEmail(email);
+    if (!user) return undefined;
+    
+    // Token expires in 1 hour
+    const expires = new Date();
+    expires.setHours(expires.getHours() + 1);
+    
+    // Generate token
+    const token = randomBytes(32).toString('hex');
+    
+    const updatedUser = { 
+      ...user, 
+      passwordResetToken: token,
+      passwordResetExpires: expires
+    };
+    
+    this.users.set(user.id, updatedUser);
+    
+    return { token, expires };
+  }
+  
+  async resetPassword(token: string, newPassword: string): Promise<User | undefined> {
+    const user = await this.getUserByPasswordResetToken(token);
+    if (!user) return undefined;
+    
+    const updatedUser = { 
+      ...user, 
+      password: newPassword,
+      passwordResetToken: null,
+      passwordResetExpires: null
+    };
+    
+    this.users.set(user.id, updatedUser);
+    
+    return updatedUser;
+  }
+  
+  async createOrUpdateTwitchUser(twitchData: { twitchId: string, username: string, email: string, accessToken: string, refreshToken: string }): Promise<User> {
+    // Check if user already exists with this Twitch ID
+    let user = await this.getUserByTwitchId(twitchData.twitchId);
+    
+    if (user) {
+      // Update existing user
+      const updatedUser = { 
+        ...user, 
+        twitchAccessToken: twitchData.accessToken,
+        twitchRefreshToken: twitchData.refreshToken
+      };
+      
+      this.users.set(user.id, updatedUser);
+      return updatedUser;
+    } else {
+      // Check if user exists with this email
+      user = await this.getUserByEmail(twitchData.email);
+      
+      if (user) {
+        // Link Twitch account to existing user
+        const updatedUser = { 
+          ...user, 
+          twitchId: twitchData.twitchId,
+          twitchAccessToken: twitchData.accessToken,
+          twitchRefreshToken: twitchData.refreshToken,
+          emailVerified: true // Twitch verified their email
+        };
+        
+        this.users.set(user.id, updatedUser);
+        return updatedUser;
+      } else {
+        // Create new user from Twitch data
+        const id = this.currentUserId++;
+        // Generate a random password (they'll need to reset it if they want to login without Twitch)
+        const password = randomBytes(16).toString('hex');
+        
+        const newUser: User = {
+          id,
+          username: twitchData.username,
+          email: twitchData.email,
+          password,
+          role: "user",
+          emailVerified: true, // Twitch verified their email
+          twitchId: twitchData.twitchId,
+          twitchAccessToken: twitchData.accessToken,
+          twitchRefreshToken: twitchData.refreshToken,
+          stripeCustomerId: null,
+          stripeSubscriptionId: null,
+          passwordResetToken: null,
+          passwordResetExpires: null,
+          rememberedSession: false,
+          createdAt: new Date()
+        };
+        
+        this.users.set(id, newUser);
+        return newUser;
+      }
+    }
+  }
+  
+  async updateRememberedSession(id: number, remembered: boolean): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = { ...user, rememberedSession: remembered };
     this.users.set(id, updatedUser);
     return updatedUser;
   }
