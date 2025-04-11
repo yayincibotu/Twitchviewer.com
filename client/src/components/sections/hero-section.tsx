@@ -228,148 +228,189 @@ export default function HeroSection({ onGetStarted }: HeroSectionProps) {
         </div>
         
         <div className="mt-16 relative animate-fade-in" style={{animationDelay: '1s'}}>
-          <div className="relative max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-elevated">
-            {/* Dashboard header */}
-            <div className="bg-neutral-800 p-2 sm:p-3 flex items-center space-x-1.5">
-              <div className="h-3 w-3 rounded-full bg-red-500"></div>
-              <div className="h-3 w-3 rounded-full bg-yellow-500"></div>
-              <div className="h-3 w-3 rounded-full bg-green-500"></div>
-              <div className="ml-2 text-neutral-300 text-xs font-medium">TwitchViewer Dashboard</div>
-            </div>
-            
-            {/* Dashboard content */}
-            <div className="bg-neutral-900 w-full h-auto aspect-video p-4 flex flex-col">
-              <div className="flex justify-between items-center mb-4 bg-neutral-800/50 rounded-lg p-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded bg-purple-600 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M4 3h16v12h-6l-4 4v-4H4V3zm12 4h-2v4h2V7zm-6 0h2v4h-2V7z" />
-                    </svg>
-                  </div>
-                  <div className="text-white font-medium">YourTwitchChannel</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="px-3 py-1 bg-green-600/20 text-green-400 rounded-full text-xs font-medium">Live</div>
+          <div className="relative max-w-4xl mx-auto rounded-lg overflow-hidden shadow-elevated">
+            {/* Twitch Stream Header - Based on reference image */}
+            <div className="bg-[#18181b] p-2 flex items-center justify-between border-b border-[#303032]">
+              <div className="flex items-center space-x-1">
+                <div className="flex items-center space-x-1">
+                  {['home', 'browse', 'esports', 'music'].map((item, i) => (
+                    <div key={i} className="text-[#efeff1] text-xs px-2 py-1 uppercase hover:bg-[#303032] cursor-pointer rounded">
+                      {item}
+                    </div>
+                  ))}
                 </div>
               </div>
-              
-              <div className="grid grid-cols-12 gap-3 mb-4">
-                {/* Left side - Stats */}
-                <div className="col-span-4 grid grid-rows-3 gap-3">
-                  <div className="bg-neutral-800/40 rounded-lg p-3">
-                    <div className="text-neutral-400 text-xs mb-1">Current Viewers</div>
-                    <div className="text-white text-xl font-bold">{(viewerCount * 0.1).toFixed(0)}</div>
-                    <div className="text-green-400 text-xs flex items-center mt-1">
-                      <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M7 14l5-5 5 5H7z" />
-                      </svg>
-                      +12.4%
-                    </div>
-                  </div>
-                  <div className="bg-neutral-800/40 rounded-lg p-3">
-                    <div className="text-neutral-400 text-xs mb-1">Followers Today</div>
-                    <div className="text-white text-xl font-bold">26</div>
-                    <div className="text-green-400 text-xs flex items-center mt-1">
-                      <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M7 14l5-5 5 5H7z" />
-                      </svg>
-                      +7.8%
-                    </div>
-                  </div>
-                  <div className="bg-neutral-800/40 rounded-lg p-3">
-                    <div className="text-neutral-400 text-xs mb-1">Channel Rank</div>
-                    <div className="text-white text-xl font-bold">#1,342</div>
-                    <div className="text-green-400 text-xs flex items-center mt-1">
-                      <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M7 14l5-5 5 5H7z" />
-                      </svg>
-                      +128
-                    </div>
-                  </div>
+              <div className="flex items-center">
+                <div className="bg-[#3a3a3d] text-[#efeff1] text-xs rounded px-3 py-1 mr-2">
+                  STREAM CHAT
                 </div>
-                
-                {/* Middle - Chart */}
-                <div className="col-span-4 flex flex-col bg-neutral-800/30 rounded-lg p-3">
-                  <div className="text-neutral-400 text-xs mb-2">Viewer Activity (Last 24 hours)</div>
-                  <div className="flex-1 flex items-end">
-                    <div className="flex-1 flex items-end space-x-1">
-                      {[15, 25, 20, 30, 35, 40, 42, 50, 45, 48, 60, 70, 65, 75, 85, 80, 90, 100, 95, 98].map((height, i) => (
-                        <div 
-                          key={i} 
-                          className="flex-1 bg-gradient-to-t from-primary to-purple-600 rounded-sm" 
-                          style={{ height: `${height}%`, transitionDelay: `${i * 50}ms` }}
-                        ></div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Right side - Chat and Notifications */}
-                <div className="col-span-4 flex flex-col gap-3">
-                  {/* Chat box */}
-                  <div className="flex-1 flex flex-col bg-neutral-800/50 rounded-lg overflow-hidden">
-                    <div className="bg-neutral-800/80 px-3 py-2 flex items-center">
-                      <svg className="w-4 h-4 text-neutral-400 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" />
-                      </svg>
-                      <div className="text-neutral-300 text-xs">Chat</div>
-                    </div>
-                    <div className="flex-1 overflow-y-auto p-2 h-28 bg-neutral-900/50">
-                      {chatMessages.map(message => (
-                        <div key={message.id} className="mb-1 last:mb-0 animate-fade-in">
-                          <span className="text-xs" style={{ color: message.color }}>
-                            {message.username}:
-                          </span>
-                          <span className="text-xs text-neutral-300 ml-1">{message.message}</span>
+              </div>
+            </div>
+            
+            {/* Live stream content - grid layout with main view and chat */}
+            <div className="grid grid-cols-12">
+              {/* Main stream view */}
+              <div className="col-span-9 relative bg-[#0e0e10]">
+                {/* Game footage - using a forest/nature scene as in the reference */}
+                <div className="relative w-full aspect-[16/9] overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e10]/80 via-transparent to-transparent"></div>
+                  <div 
+                    className="w-full h-full bg-cover bg-center"
+                    style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&q=80&w=1000)' }}
+                  ></div>
+                  
+                  {/* Streamer webcam overlay */}
+                  <div className="absolute bottom-3 left-3 w-32 h-32 rounded overflow-hidden border-2 border-[#9147ff]">
+                    <div className="w-full h-full bg-cover bg-center bg-[#1f1f23]">
+                      <div className="w-full h-full flex items-end">
+                        <div className="w-full bg-gradient-to-t from-black/70 to-transparent px-2 py-1">
+                          <div className="flex items-center">
+                            <div className="h-5 w-5 rounded-full bg-red-500 mr-1"></div>
+                            <span className="text-xs text-white font-medium">LIVE</span>
+                          </div>
                         </div>
-                      ))}
-                      <div ref={chatEndRef} />
+                      </div>
                     </div>
                   </div>
                   
-                  {/* Notifications */}
-                  <div className="h-32 bg-neutral-800/30 rounded-lg p-2 overflow-hidden">
-                    {notifications.map((notification) => (
-                      <div key={notification.id} className="mb-2 last:mb-0 p-2 bg-purple-500/20 rounded-md border border-purple-500/20 animate-slide-right">
-                        {notification.type === 'follow' && (
-                          <div className="flex items-center">
-                            <div className="mr-2 bg-purple-600/30 p-1 rounded">
-                              <svg className="w-3 h-3 text-purple-400" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
-                              </svg>
-                            </div>
-                            <div className="text-xs text-neutral-200">
-                              <span className="font-semibold text-purple-300">{notification.username}</span> just followed!
-                            </div>
-                          </div>
-                        )}
-                        {notification.type === 'subscription' && (
-                          <div className="flex items-center">
-                            <div className="mr-2 bg-blue-600/30 p-1 rounded">
-                              <svg className="w-3 h-3 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M20 8H4V6h16v2zm-2-6H6v2h12V2zm4 10v8c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2v-8c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2zm-6 4l-6-3.27v6.53L16 16z" />
-                              </svg>
-                            </div>
-                            <div className="text-xs text-neutral-200">
-                              <span className="font-semibold text-blue-300">{notification.username}</span> subscribed!
-                            </div>
-                          </div>
-                        )}
-                        {notification.type === 'donation' && (
-                          <div className="flex items-center">
-                            <div className="mr-2 bg-green-600/30 p-1 rounded">
-                              <svg className="w-3 h-3 text-green-400" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" />
-                              </svg>
-                            </div>
-                            <div className="text-xs text-neutral-200">
-                              <span className="font-semibold text-green-300">{notification.username}</span> donated{' '}
-                              <span className="font-bold text-green-300">${notification.amount}</span>!
-                            </div>
-                          </div>
-                        )}
+                  {/* Stream viewers count */}
+                  <div className="absolute top-3 left-3 bg-[#18181b]/80 text-white text-xs px-2 py-1 rounded flex items-center">
+                    <div className="w-2 h-2 rounded-full bg-red-500 mr-1"></div>
+                    <span>{(viewerCount * 0.1).toFixed(0)} viewers</span>
+                  </div>
+                  
+                  {/* Stream controls */}
+                  <div className="absolute bottom-3 right-3 flex items-center space-x-2">
+                    <div className="bg-[#18181b]/80 text-white p-1 rounded hover:bg-[#303032]/80 cursor-pointer">
+                      <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.5 8.5a1 1 0 011 0v3a1 1 0 01-1 0v-3zm4-1.5a1 1 0 00-.5.5v5a1 1 0 001 0v-5a1 1 0 00-.5-.5z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="bg-[#18181b]/80 text-white p-1 rounded hover:bg-[#303032]/80 cursor-pointer">
+                      <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="bg-[#18181b]/80 text-white p-1 rounded hover:bg-[#303032]/80 cursor-pointer">
+                      <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H9.771l-.003.011-.004.013-.008.028-.022.084-.045.165-.104.343-.149.48a1 1 0 01-.1.219l-.75-.75.104-.343c.074-.245.141-.471.185-.626z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Stream info bar */}
+                <div className="bg-[#0e0e10] p-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 bg-[#9147ff] rounded-full flex items-center justify-center text-white font-bold mr-2">G</div>
+                      <div>
+                        <div className="text-[#efeff1] font-bold text-sm">Glorious_E</div>
+                        <div className="text-[#adadb8] text-xs">Let me cook 🍳 - !event o7 join my !socials | @glorious_e</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button className="bg-[#9147ff] text-white px-4 py-1 rounded-lg text-sm font-semibold hover:bg-[#772ce8]">
+                        Follow
+                      </button>
+                      <button className="bg-transparent border border-[#3a3a3d] text-[#efeff1] px-3 py-1 rounded-lg text-sm flex items-center hover:bg-[#3a3a3d]/30">
+                        Subscribe
+                        <svg className="w-3 h-3 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Stream details */}
+                <div className="bg-[#0e0e10] px-3 py-1 border-t border-[#303032] flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="text-[#adadb8] text-xs border border-[#303032] px-2 py-0.5 rounded mr-2">Escape from Tarkov</div>
+                    <div className="text-[#adadb8] text-xs border border-[#303032] px-2 py-0.5 rounded mr-2">PVP</div>
+                    <div className="text-[#adadb8] text-xs border border-[#303032] px-2 py-0.5 rounded mr-2">English</div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="text-[#adadb8] text-xs mr-2">3,108</div>
+                    <div className="text-[#adadb8] text-xs">2:40:30</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Chat sidebar */}
+              <div className="col-span-3 bg-[#1f1f23] h-full max-h-[460px] border-l border-[#303032] flex flex-col">
+                <div className="p-2 border-b border-[#303032] text-sm text-[#adadb8] font-semibold">
+                  STREAM CHAT
+                </div>
+                
+                {/* Chat messages */}
+                <div className="flex-1 overflow-y-auto p-2">
+                  <div className="space-y-2">
+                    {/* Subscriber list */}
+                    <div className="flex items-center mb-3">
+                      <div className="w-5 h-5 text-yellow-400 mr-1">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="text-yellow-400 text-xs font-bold">thehappycamper</div>
+                      <div className="text-xs text-[#adadb8] ml-1">53</div>
+                    </div>
+                    
+                    {/* Chat messages */}
+                    {chatMessages.slice(0, 8).map((message, index) => (
+                      <div key={index} className="animate-fade-in">
+                        <span className="text-xs" style={{ color: message.color }}>
+                          {message.username}:
+                        </span>
+                        <span className="text-xs text-[#adadb8] ml-1">{message.message}</span>
                       </div>
                     ))}
+                    
+                    {/* Some special formatted messages */}
+                    <div>
+                      <span className="text-xs text-blue-400">sakocean:</span>
+                      <span className="text-xs text-[#adadb8] ml-1">you better stock up on some noodles. tariffs</span>
+                    </div>
+                    
+                    <div>
+                      <span className="text-xs text-purple-400">Fourtone:</span>
+                      <span className="text-xs text-[#adadb8] ml-1">lchip</span>
+                    </div>
+                    
+                    <div>
+                      <span className="text-xs text-green-400">Greeshot:</span>
+                      <span className="text-xs text-blue-400 ml-1 underline">https://clips.twitch.tv/BloodyKindHorse#links</span>
+                    </div>
+                    
+                    <div>
+                      <span className="text-xs text-blue-400">sawaquare:</span>
+                      <span className="text-xs text-[#adadb8] ml-1">Dengo</span>
+                    </div>
+                    
+                    <div>
+                      <span className="text-xs text-red-400">cheekymogan:</span>
+                      <span className="text-xs text-[#adadb8] ml-1">lchip</span>
+                    </div>
+                    
+                    <div>
+                      <span className="text-xs text-purple-400">capitalist:</span>
+                      <span className="text-xs text-[#adadb8] ml-1">x3 budok kept me on the toplist for 4h</span>
+                    </div>
+                    
+                    <div>
+                      <span className="text-xs text-pink-400">wildburr:</span>
+                      <span className="text-xs text-[#adadb8] ml-1">I don't think we need to remind you to order food bro 🍕</span>
+                    </div>
+                    
+                    <div ref={chatEndRef} />
+                  </div>
+                </div>
+                
+                {/* Chat input */}
+                <div className="p-2 border-t border-[#303032]">
+                  <div className="rounded bg-[#3a3a3d] p-1 text-center text-xs text-[#adadb8]">
+                    Send a message
                   </div>
                 </div>
               </div>
