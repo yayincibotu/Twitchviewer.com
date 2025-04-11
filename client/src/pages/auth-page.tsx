@@ -380,7 +380,23 @@ export default function AuthPage() {
                             )}
                           />
                           
-
+                          <FormField
+                            control={registerForm.control}
+                            name="turnstileToken"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Security Verification</FormLabel>
+                                <FormControl>
+                                  <TurnstileWidget
+                                    onVerify={(token) => field.onChange(token)}
+                                    onExpire={() => field.onChange("")}
+                                    onError={() => field.onChange("")}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                           
                           <Button 
                             type="submit" 
@@ -458,7 +474,23 @@ export default function AuthPage() {
                             )}
                           />
                           
-
+                          <FormField
+                            control={resetRequestForm.control}
+                            name="turnstileToken"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Security Verification</FormLabel>
+                                <FormControl>
+                                  <TurnstileWidget
+                                    onVerify={(token) => field.onChange(token)}
+                                    onExpire={() => field.onChange("")}
+                                    onError={() => field.onChange("")}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                           
                           <Button 
                             type="submit" 

@@ -1,5 +1,5 @@
 import { forwardRef, useId, useState, useEffect, useRef } from "react";
-import { Turnstile } from "react-cloudflare-turnstile";
+import Turnstile from "react-cloudflare-turnstile";
 
 interface TurnstileProps {
   onVerify: (token: string) => void;
@@ -46,10 +46,10 @@ export const TurnstileWidget = forwardRef<HTMLDivElement, TurnstileProps>(
       <div ref={ref} className={className} {...props}>
         <Turnstile
           key={key}
-          sitekey={TURNSTILE_SITE_KEY}
-          onVerify={onVerify}
-          onExpire={onExpire || reset}
-          onError={onError}
+          turnstileSiteKey={TURNSTILE_SITE_KEY}
+          callback={onVerify}
+          expiredCallback={onExpire || reset}
+          errorCallback={onError}
           theme="auto"
           className="mt-2"
         />
