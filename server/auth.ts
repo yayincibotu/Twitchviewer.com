@@ -84,6 +84,8 @@ export function setupAuth(app: Express) {
     try {
       const { username, email, password, turnstileToken } = req.body;
       
+      // Turnstile doğrulaması geçici olarak devre dışı bırakıldı
+      /*
       // Verify Turnstile Token
       if (!turnstileToken) {
         return res.status(400).json({ message: "Turnstile verification required" });
@@ -93,6 +95,7 @@ export function setupAuth(app: Express) {
       if (!isValidTurnstile) {
         return res.status(400).json({ message: "Turnstile verification failed" });
       }
+      */
       
       // Check if username already exists
       const existingUsername = await storage.getUserByUsername(username);
@@ -140,6 +143,8 @@ export function setupAuth(app: Express) {
     try {
       const { turnstileToken } = req.body;
       
+      // Turnstile doğrulaması geçici olarak devre dışı bırakıldı
+      /*
       // Verify Turnstile Token
       if (!turnstileToken) {
         return res.status(400).json({ message: "Turnstile verification required" });
@@ -149,6 +154,7 @@ export function setupAuth(app: Express) {
       if (!isValidTurnstile) {
         return res.status(400).json({ message: "Turnstile verification failed" });
       }
+      */
       
       // Continue with passport authentication
       passport.authenticate("local", (err: Error | null, user: SelectUser | false) => {
@@ -219,6 +225,8 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "Email is required" });
       }
       
+      // Turnstile doğrulaması geçici olarak devre dışı bırakıldı
+      /*
       // Verify Turnstile Token
       if (!turnstileToken) {
         return res.status(400).json({ message: "Turnstile verification required" });
@@ -228,6 +236,7 @@ export function setupAuth(app: Express) {
       if (!isValidTurnstile) {
         return res.status(400).json({ message: "Turnstile verification failed" });
       }
+      */
       
       const resetTokenData = await storage.setPasswordResetToken(email);
       
