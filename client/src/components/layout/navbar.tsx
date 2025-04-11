@@ -152,7 +152,7 @@ export default function Navbar() {
           </nav>
           
           {/* Auth Buttons (Desktop) */}
-          <div className="hidden md:flex items-center space-x-3 ml-4">
+          <div className="hidden lg:flex items-center space-x-3 ml-4">
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -203,8 +203,27 @@ export default function Navbar() {
             )}
           </div>
           
-          {/* Mobile menu button */}
-          <div className="flex lg:hidden">
+          {/* Mobile Auth and Menu */}
+          <div className="flex lg:hidden items-center">
+            {!user && (
+              <div className="flex items-center space-x-2 mr-2">
+                <Link href="/auth">
+                  <Button 
+                    variant="ghost" 
+                    className="rounded-xl text-neutral-600 hover:text-primary hover:bg-primary/5 text-sm"
+                  >
+                    Sign in
+                  </Button>
+                </Link>
+                <Link href="/auth">
+                  <Button className="btn-gradient px-3 py-1.5 rounded-xl shadow-button hover:shadow-xl text-sm">
+                    Sign up
+                  </Button>
+                </Link>
+              </div>
+            )}
+            
+            {/* Mobile menu button */}
             <button
               type="button"
               className="inline-flex items-center justify-center p-2 rounded-lg text-neutral-600 hover:text-primary hover:bg-primary/5 transition-colors duration-300"
@@ -248,57 +267,37 @@ export default function Navbar() {
             Pricing
           </MobileNavLink>
           
-          {user ? (
-            <>
-              <div className="pt-4 pb-3 border-t border-neutral-200">
-                <div className="flex items-center px-3">
-                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-primary/80 to-violet-600/80 flex items-center justify-center shadow-md">
-                    <User className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="ml-3">
-                    <div className="text-base font-medium text-neutral-800">{user.username}</div>
-                    <div className="text-sm font-medium text-neutral-500">{user.email}</div>
-                  </div>
+          {user && (
+            <div className="pt-4 pb-3 border-t border-neutral-200">
+              <div className="flex items-center px-3">
+                <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-primary/80 to-violet-600/80 flex items-center justify-center shadow-md">
+                  <User className="h-5 w-5 text-white" />
                 </div>
-                <div className="mt-3 space-y-1">
-                  <MobileNavLink href="/dashboard">
-                    <LayoutDashboard className="h-4 w-4 mr-2" />
-                    Dashboard
-                  </MobileNavLink>
-                  
-                  {user.role === "admin" && (
-                    <MobileNavLink href="/admin">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Admin Panel
-                    </MobileNavLink>
-                  )}
-                  
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center w-full text-left px-3 py-3 rounded-lg text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors duration-300"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </button>
+                <div className="ml-3">
+                  <div className="text-base font-medium text-neutral-800">{user.username}</div>
+                  <div className="text-sm font-medium text-neutral-500">{user.email}</div>
                 </div>
               </div>
-            </>
-          ) : (
-            <div className="pt-4 pb-3 border-t border-neutral-200">
-              <div className="grid grid-cols-2 gap-3 p-3">
-                <Link href="/auth">
-                  <Button 
-                    variant="outline" 
-                    className="w-full px-4 py-5 rounded-xl border-neutral-200 shadow-soft hover:shadow-md text-neutral-700"
-                  >
-                    Sign in
-                  </Button>
-                </Link>
-                <Link href="/auth">
-                  <Button className="w-full btn-gradient px-4 py-5 rounded-xl shadow-button hover:shadow-xl">
-                    Sign up
-                  </Button>
-                </Link>
+              <div className="mt-3 space-y-1">
+                <MobileNavLink href="/dashboard">
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  Dashboard
+                </MobileNavLink>
+                
+                {user.role === "admin" && (
+                  <MobileNavLink href="/admin">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Admin Panel
+                  </MobileNavLink>
+                )}
+                
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full text-left px-3 py-3 rounded-lg text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors duration-300"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </button>
               </div>
             </div>
           )}
