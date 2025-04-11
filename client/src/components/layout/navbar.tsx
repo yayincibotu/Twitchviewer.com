@@ -62,47 +62,101 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          {/* Premium Logo */}
+          {/* Ultra Premium Logo */}
           <div className="flex-shrink-0">
             <Link href="/">
-              <div className="font-bold flex items-center group">
-                {/* Animated logo mark */}
+              <div className="font-bold flex items-center group relative">
+                {/* SVG Background Patterns */}
+                <div className="absolute -inset-3 opacity-0 group-hover:opacity-10 transition-opacity duration-700">
+                  <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="absolute top-0 left-0 transform rotate-45 group-hover:rotate-[60deg] transition-transform duration-1000">
+                    <path d="M10,30 Q50,10 90,30 T170,30" stroke="currentColor" strokeWidth="0.5" fill="none" className="text-primary" />
+                    <path d="M10,35 Q50,15 90,35 T170,35" stroke="currentColor" strokeWidth="0.5" fill="none" className="text-primary" />
+                    <path d="M10,40 Q50,20 90,40 T170,40" stroke="currentColor" strokeWidth="0.5" fill="none" className="text-primary" />
+                    <path d="M10,45 Q50,25 90,45 T170,45" stroke="currentColor" strokeWidth="0.5" fill="none" className="text-primary" />
+                    <path d="M10,50 Q50,30 90,50 T170,50" stroke="currentColor" strokeWidth="0.5" fill="none" className="text-primary" />
+                    <path d="M10,55 Q50,35 90,55 T170,55" stroke="currentColor" strokeWidth="0.5" fill="none" className="text-primary" />
+                  </svg>
+                </div>
+                
+                {/* Animated logo mark - layered 3D effect */}
                 <div className="relative">
-                  {/* Base elements - interactive 3D-like layers */}
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-700 to-violet-800 flex items-center justify-center text-white shadow-elevated transform transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3">
-                    {/* Background pulse effect */}
-                    <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-600/50 to-violet-700/50 blur-sm group-hover:blur-md transform transition-all duration-300 group-hover:scale-110 animate-pulse-slow"></div>
+                  {/* Deep shadow base */}
+                  <div className="absolute -inset-[3px] bg-black/10 rounded-2xl blur-md transform transition-all duration-500 group-hover:blur-lg group-hover:inset-[-5px]"></div>
+                  
+                  {/* Light reflection layer */}
+                  <div className="absolute -inset-[2px] rounded-2xl bg-gradient-to-tr from-white/80 via-transparent to-transparent opacity-20 group-hover:opacity-30 transition-opacity duration-500 group-hover:blur-sm"></div>
+                  
+                  {/* Main logo hexagon container */}
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-800 to-violet-900 flex items-center justify-center text-white shadow-elevated transform transition-all duration-500 group-hover:scale-105 group-hover:rotate-6 relative z-10 overflow-hidden">
+                    {/* Animated radar sweep effect */}
+                    <div className="absolute inset-0 animate-spin-slow opacity-20 pointer-events-none">
+                      <div className="absolute top-1/2 bottom-0 left-0 right-1/2 bg-gradient-to-tr from-blue-400 to-transparent blur-md"></div>
+                    </div>
                     
-                    {/* Main Icon */}
-                    <div className="relative z-10 flex items-center justify-center w-full h-full">
+                    {/* Main background glow */}
+                    <div className="absolute inset-0 bg-gradient-to-tl from-blue-500/30 via-violet-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"></div>
+                    
+                    {/* Border highlight */}
+                    <div className="absolute inset-0 rounded-2xl border border-white/10 group-hover:border-white/20 transition-colors duration-300 pointer-events-none"></div>
+                    
+                    {/* Twitch icon with animation */}
+                    <div className="relative z-20 flex items-center justify-center w-full h-full">
                       <svg 
                         xmlns="http://www.w3.org/2000/svg" 
                         viewBox="0 0 24 24" 
                         fill="currentColor" 
-                        className="w-7 h-7 group-hover:scale-110 transform transition-all duration-300"
+                        className="w-7 h-7 transform group-hover:scale-110 group-hover:rotate-[-6deg] transition-all duration-500"
                       >
                         <path d="M4 3h16v12h-6l-4 4v-4H4V3zm12 4h-2v4h2V7zm-6 0h2v4h-2V7z"/>
                       </svg>
                       
-                      {/* Glowing dot - live status indicator */}
-                      <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-green-400 shadow-glow animate-pulse"></div>
+                      {/* Viewer count pulse indicator */}
+                      <div className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-green-400 shadow-glow">
+                        {/* Expanding rings effect */}
+                        <div className="absolute inset-0 rounded-full animate-ping bg-green-400/70"></div>
+                        <div className="absolute -inset-1 rounded-full animate-ping bg-green-400/30 animation-delay-150"></div>
+                        <div className="absolute -inset-2 rounded-full animate-ping bg-green-400/10 animation-delay-300"></div>
+                      </div>
+                    </div>
+                    
+                    {/* Particle effects */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                      <div className="absolute top-1/4 left-1/4 w-1 h-1 rounded-full bg-white/80 animate-float animation-delay-100"></div>
+                      <div className="absolute top-3/4 right-1/4 w-0.5 h-0.5 rounded-full bg-white/60 animate-float animation-delay-200"></div>
+                      <div className="absolute bottom-1/4 right-1/3 w-1 h-1 rounded-full bg-white/70 animate-float animation-delay-300"></div>
                     </div>
                   </div>
                   
-                  {/* Subtle reflection effect */}
-                  <div className="absolute -bottom-1 left-1 right-1 h-2 rounded-xl bg-blue-700/20 filter blur-sm transform transition-all duration-300 group-hover:blur-md group-hover:bg-blue-700/30"></div>
+                  {/* 3D edge and reflection */}
+                  <div className="absolute -bottom-1 -right-1 left-1 h-2 rounded-b-xl bg-black/20 blur-sm transform transition-transform duration-500 group-hover:scale-105 group-hover:rotate-6"></div>
+                  <div className="absolute bottom-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </div>
                 
-                {/* Brand Text with gradient */}
-                <div className="relative ml-3 flex flex-col">
-                  <span className="text-xl md:text-2xl bg-gradient-to-r from-blue-700 via-violet-700 to-purple-700 bg-clip-text text-transparent font-heading tracking-tight leading-none hidden sm:inline">
-                    Twitch<span className="font-bold">Viewer</span>
-                  </span>
+                {/* Brand Text with premium styling */}
+                <div className="relative ml-4 flex flex-col">
+                  {/* Main brand name with shine effect */}
+                  <div className="relative overflow-hidden hidden sm:block">
+                    <span className="text-2xl md:text-2xl font-bold bg-gradient-to-r from-blue-700 via-indigo-600 to-violet-700 bg-clip-text text-transparent font-heading tracking-tight leading-none">
+                      Twitch<span className="font-black">Viewer</span>
+                    </span>
+                    
+                    {/* Animated shine effect */}
+                    <div className="absolute inset-0 w-full group-hover:animate-shine pointer-events-none">
+                      <div className="absolute -inset-full top-0 right-full w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12"></div>
+                    </div>
+                  </div>
                   
-                  {/* Animated tagline with slide-in text */}
-                  <span className="text-[10px] text-blue-700/70 font-medium uppercase tracking-wider mt-0.5 hidden sm:inline overflow-hidden group-hover:after:content-['Pro'] after:ml-px after:animate-typewriter">
-                    Viewer Boost
-                  </span>
+                  {/* Advanced tagline with animations */}
+                  <div className="hidden sm:flex items-center space-x-1">
+                    <div className="h-3 w-3 rounded-full bg-blue-700/20 relative overflow-hidden">
+                      <div className="absolute inset-0 rounded-full bg-blue-600 scale-0 group-hover:scale-100 transition-transform duration-700 origin-left"></div>
+                    </div>
+                    <div className="font-medium text-xs tracking-wider text-blue-900/60 group-hover:text-blue-800 transition-colors duration-300 flex items-center overflow-hidden">
+                      <span className="translate-y-0 group-hover:-translate-y-full transition-transform duration-300">VIEWER BOOST</span>
+                      <span className="absolute translate-y-full group-hover:translate-y-0 transition-transform duration-300 text-blue-700">PREMIUM SERVICE</span>
+                    </div>
+                    <span className="text-[10px] text-blue-700 font-black opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:translate-x-0 translate-x-[-5px]">PRO</span>
+                  </div>
                 </div>
               </div>
             </Link>
