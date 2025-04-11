@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Helmet } from "react-helmet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
