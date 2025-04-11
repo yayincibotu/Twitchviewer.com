@@ -138,7 +138,7 @@ export default function Navbar() {
               Features
             </NavLink>
             
-            <NavLink href="/#pricing">
+            <NavLink href="/pricing">
               Pricing
             </NavLink>
             
@@ -232,7 +232,7 @@ export default function Navbar() {
             Features
           </MobileNavLink>
           
-          <MobileNavLink href="/#pricing">
+          <MobileNavLink href="/pricing">
             Pricing
           </MobileNavLink>
           
