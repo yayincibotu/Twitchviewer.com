@@ -18,11 +18,6 @@ export default function ViewerBotPage() {
     queryKey: ['/api/seo/viewer-bot'],
     queryFn: async () => {
       const res = await fetch('/api/seo/viewer-bot');
-      if (!res.ok) return {
-        title: "Twitch Viewer Bot Service | Boost Your Stream Views",
-        description: "Premium Twitch viewer bot service to boost your stream views. Real-looking viewers, analytics, and 24/7 support. Start growing your channel today!",
-        focusKeyword: "twitch viewer bot",
-      };
       return await res.json();
     }
   });

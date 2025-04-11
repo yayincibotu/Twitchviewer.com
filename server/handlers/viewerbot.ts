@@ -1,5 +1,6 @@
 import { Express } from "express";
 import { storage } from "../storage";
+import { defaultViewerBotSeo } from "../../shared/data/seo";
 
 export function registerViewerBotRoutes(app: Express) {
   // Get SEO settings for viewer bot page
@@ -7,11 +8,7 @@ export function registerViewerBotRoutes(app: Express) {
     try {
       const seoSettings = await storage.getSeoSettings("viewer-bot");
       if (!seoSettings) {
-        return res.status(404).json({
-          title: "Twitch Viewer Bot Service | Boost Your Stream Views",
-          description: "Premium Twitch viewer bot service to boost your stream views. Real-looking viewers, analytics, and 24/7 support. Start growing your channel today!",
-          focusKeyword: "twitch viewer bot",
-        });
+        return res.status(404).json(defaultViewerBotSeo);
       }
       return res.json(seoSettings);
     } catch (error) {

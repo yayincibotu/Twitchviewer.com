@@ -5,6 +5,7 @@ import Stripe from "stripe";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
+import { registerViewerBotRoutes } from "./handlers/viewerbot";
 
 // Önbelleğe alma için basit bir mekanizma
 interface CacheEntry {
@@ -784,6 +785,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Error generating sitemap: " + error.message });
     }
   });
+  
+  // Register viewer bot routes
+  registerViewerBotRoutes(app);
 
   // Geliştirme ortamında HTTP, prodüksiyonda HTTP/2 kullan
   let httpServer: Server;
