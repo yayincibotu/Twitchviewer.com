@@ -168,10 +168,7 @@ export default function HeroSection({ onGetStarted }: HeroSectionProps) {
               className="btn-gradient px-8 py-6 text-base animate-fade-in"
               style={{animationDelay: '0.7s'}}
               onClick={() => {
-                const pricingSection = document.getElementById('pricing');
-                if (pricingSection) {
-                  pricingSection.scrollIntoView({ behavior: 'smooth' });
-                }
+                window.location.href = '/pricing';
               }}
             >
               See Pricing

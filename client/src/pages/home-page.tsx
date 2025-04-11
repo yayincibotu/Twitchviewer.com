@@ -6,7 +6,7 @@ import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import HeroSection from "@/components/sections/hero-section";
 import FeaturesSection from "@/components/sections/features-section";
-import PricingSection from "@/components/sections/pricing-section";
+// import PricingSection from "@/components/sections/pricing-section";
 import ContactSection from "@/components/sections/contact-section";
 import CtaSection from "@/components/sections/cta-section";
 import { useAuth } from "@/hooks/use-auth";
@@ -84,8 +84,6 @@ export default function HomePage() {
           
           {/* Başarı hikayeleri */}
           <SuccessStoriesSection />
-          
-          <PricingSection />
           
           {/* Blog önizleme */}
           <BlogPreviewSection />

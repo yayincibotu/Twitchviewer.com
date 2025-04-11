@@ -15,10 +15,7 @@ export default function CtaSection() {
   };
 
   const handleSeePricing = () => {
-    const pricingSection = document.getElementById('pricing');
-    if (pricingSection) {
-      pricingSection.scrollIntoView({ behavior: 'smooth' });
-    }
+    window.location.href = '/pricing';
   };
 
   return (

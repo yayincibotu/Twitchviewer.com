@@ -187,17 +187,17 @@ export default function PricingPage() {
                       <div className="mt-6 flex items-baseline">
                         {hasDiscount && (
                           <span className="text-lg line-through text-neutral-400 mr-2">
-                            ${selectedInterval === 'monthly' ? pkg.priceMonthly : (pkg.priceMonthly * 0.8 * 12).toFixed(0)}
+                            ${selectedInterval === 'monthly' ? (pkg.price / 100).toFixed(0) : ((pkg.price / 100) * 12 * 0.8).toFixed(0)}
                           </span>
                         )}
-                        <span className="text-5xl font-extrabold text-neutral-900">${monthlyPrice.toFixed(0)}</span>
+                        <span className="text-5xl font-extrabold text-neutral-900">${displayPrice.toFixed(0)}</span>
                         <span className="ml-1 text-neutral-500">
                           /{selectedInterval === 'monthly' ? 'mo' : 'yr'}
                         </span>
                       </div>
                       
                       <ul className="mt-8 space-y-4">
-                        {pkg.features?.split(",").map((feature, i) => (
+                        {pkg.features && pkg.features.map((feature: string, i: number) => (
                           <li key={i} className="flex items-start">
                             <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
                             <span className="text-neutral-600">{feature.trim()}</span>
