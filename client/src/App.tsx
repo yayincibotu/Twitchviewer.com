@@ -16,6 +16,7 @@ const AuthPage = lazy(() => import("@/pages/auth-page"));
 const DashboardPage = lazy(() => import("@/pages/dashboard-page"));
 const AdminDashboard = lazy(() => import("@/pages/admin-dashboard"));
 const CheckoutPage = lazy(() => import("@/pages/checkout"));
+const PricingPage = lazy(() => import("@/pages/pricing-page"));
 
 // Sayfa yüklenirken gösterilecek fallback bileşeni
 const PageLoader = () => (
@@ -37,6 +38,7 @@ function Router() {
         
         {/* Diğer sayfalar lazy-loaded */}
         <Route path="/auth" component={AuthPage} />
+        <Route path="/pricing" component={PricingPage} />
         <ProtectedRoute path="/dashboard" component={DashboardPage} />
         <ProtectedRoute path="/admin" component={AdminDashboard} requireAdmin />
         <ProtectedRoute path="/checkout/:packageId" component={CheckoutPage} />
