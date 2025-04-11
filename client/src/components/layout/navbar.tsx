@@ -86,20 +86,35 @@ export default function Navbar() {
                     {/* Subtle border highlight */}
                     <div className="absolute inset-0 rounded-xl border border-white/10 group-hover:border-white/20 transition-colors duration-300"></div>
                     
-                    {/* Viewers icon (Eye) */}
+                    {/* Skyrocket Icon */}
                     <div className="relative z-20 flex items-center justify-center w-full h-full">
+                      {/* Modern rocket icon */}
                       <svg 
                         xmlns="http://www.w3.org/2000/svg" 
                         viewBox="0 0 24 24" 
                         fill="currentColor" 
-                        className="w-7 h-7 transform transition-all duration-300 group-hover:scale-110"
+                        className="w-7 h-7 transform group-hover:scale-110 group-hover:translate-y-[-2px] transition-all duration-300 animate-rocket-up"
                       >
-                        <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
-                        <path fillRule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z" clipRule="evenodd" />
+                        <path d="M9.315 7.584C12.195 3.883 16.695 1.5 21.75 1.5a.75.75 0 0 1 .75.75c0 5.056-2.383 9.555-6.084 12.436A6.75 6.75 0 0 1 9.75 22.5a.75.75 0 0 1-.75-.75v-4.131A15.838 15.838 0 0 1 6.382 15H2.25a.75.75 0 0 1-.75-.75 6.75 6.75 0 0 1 7.815-6.666ZM15 6.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" />
+                        <path d="M5.26 17.242a.75.75 0 1 0-.897-1.203 5.243 5.243 0 0 0-2.05 5.022.75.75 0 0 0 .625.627 5.243 5.243 0 0 0 5.022-2.051.75.75 0 1 0-1.202-.897 3.744 3.744 0 0 1-3.008 1.51c0-1.23.592-2.323 1.51-3.008Z" />
                       </svg>
                       
-                      {/* Active status indicator */}
-                      <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-green-400 shadow-glow">
+                      {/* Animated rocket trails */}
+                      <div className="absolute bottom-1.5 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        {/* Main trail */}
+                        <div className="w-1.5 h-4 bg-gradient-to-t from-orange-500 via-orange-300 to-transparent rounded-full animate-pulse-fast"></div>
+                        
+                        {/* Side trails */}
+                        <div className="absolute -left-1 bottom-0 w-1 h-2 bg-gradient-to-t from-orange-500/70 to-transparent rounded-full animate-pulse-fast animation-delay-150"></div>
+                        <div className="absolute -right-1 bottom-0 w-1 h-2 bg-gradient-to-t from-orange-500/70 to-transparent rounded-full animate-pulse-fast animation-delay-300"></div>
+                        
+                        {/* Particles */}
+                        <div className="absolute -left-0.5 bottom-1 w-0.5 h-0.5 bg-orange-300 rounded-full animate-ping"></div>
+                        <div className="absolute right-0 bottom-2 w-0.5 h-0.5 bg-orange-300 rounded-full animate-ping animation-delay-200"></div>
+                      </div>
+                      
+                      {/* Live status indicator */}
+                      <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-green-400 shadow-glow">
                         <div className="absolute inset-0 rounded-full animate-ping bg-green-400/70"></div>
                       </div>
                     </div>
