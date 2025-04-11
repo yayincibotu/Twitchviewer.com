@@ -21,8 +21,15 @@ export const TurnstileWidget = forwardRef<HTMLDivElement, TurnstileProps>(
     const [key, setKey] = useState(0);
     const turnstileRef = useRef<any>(null);
 
+    // Konsola widget oluşturulduğunda log ekleyelim
+    useEffect(() => {
+      console.log("TurnstileWidget loaded for id:", id);
+      console.log("TURNSTILE_SITE_KEY present:", !!TURNSTILE_SITE_KEY);
+    }, [id]);
+
     // Reset the component if needed
     const reset = () => {
+      console.log("TurnstileWidget reset called");
       setKey(prevKey => prevKey + 1);
     };
 

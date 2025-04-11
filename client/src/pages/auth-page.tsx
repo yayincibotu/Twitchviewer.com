@@ -262,11 +262,23 @@ export default function AuthPage() {
                               <FormItem>
                                 <FormLabel>Security Verification</FormLabel>
                                 <FormControl>
-                                  <TurnstileWidget
-                                    onVerify={(token) => field.onChange(token)}
-                                    onExpire={() => field.onChange("")}
-                                    onError={() => field.onChange("")}
-                                  />
+                                  {/* Hata ayıklama logları ekleyelim */}
+                                  <div>
+                                    <TurnstileWidget
+                                      onVerify={(token) => {
+                                        console.log("Turnstile login verification success, token length:", token?.length || 0);
+                                        field.onChange(token);
+                                      }}
+                                      onExpire={() => {
+                                        console.log("Turnstile login token expired");
+                                        field.onChange("");
+                                      }}
+                                      onError={(error) => {
+                                        console.error("Turnstile login error:", error);
+                                        field.onChange("");
+                                      }}
+                                    />
+                                  </div>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
