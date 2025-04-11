@@ -28,8 +28,22 @@ const loginSchema = z.object({
 
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState("login");
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
+  const [resetToken, setResetToken] = useState("");
   const [, setLocation] = useLocation();
-  const { user, loginMutation, registerMutation } = useAuth();
+  const { 
+    user, 
+    loginMutation, 
+    registerMutation, 
+    requestPasswordResetMutation, 
+    resetPasswordMutation,
+    updateRememberSessionMutation 
+  } = useAuth();
+  
+  // Refs for reCAPTCHA
+  const loginRecaptchaRef = useRef<ReCAPTCHA>(null);
+  const registerRecaptchaRef = useRef<ReCAPTCHA>(null);
+  const resetRecaptchaRef = useRef<ReCAPTCHA>(null);
   
   // Redirect if already logged in
   useEffect(() => {
@@ -38,12 +52,24 @@ export default function AuthPage() {
     }
   }, [user, setLocation]);
   
+  // Extract token from URL if present
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      setResetToken(token);
+      setShowPasswordReset(true);
+      setActiveTab("reset");
+    }
+  }, []);
+  
   // Login form
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       username: "",
       password: "",
+      remember: false,
     },
   });
   
@@ -55,15 +81,94 @@ export default function AuthPage() {
       email: "",
       password: "",
       confirmPassword: "",
+      recaptchaToken: "",
     },
   });
   
-  function onLoginSubmit(values: z.infer<typeof loginSchema>) {
-    loginMutation.mutate(values);
+  // Password reset request form
+  const resetRequestForm = useForm<z.infer<typeof passwordResetRequestSchema>>({
+    resolver: zodResolver(passwordResetRequestSchema),
+    defaultValues: {
+      email: "",
+      recaptchaToken: "",
+    },
+  });
+  
+  // Password reset form (with token)
+  const resetPasswordForm = useForm<z.infer<typeof resetPasswordSchema>>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      token: resetToken,
+      newPassword: "",
+      confirmPassword: "",
+    },
+  });
+  
+  // Update reset token in the form when it changes
+  useEffect(() => {
+    resetPasswordForm.setValue("token", resetToken);
+  }, [resetToken, resetPasswordForm]);
+  
+  async function onLoginSubmit(values: z.infer<typeof loginSchema>) {
+    try {
+      const recaptchaToken = await loginRecaptchaRef.current?.executeAsync();
+      loginMutation.mutate({
+        ...values,
+        recaptchaToken: recaptchaToken || undefined
+      });
+      
+      // If remember me is checked, update the session
+      if (values.remember) {
+        updateRememberSessionMutation.mutate({ remember: true });
+      }
+    } catch (error) {
+      console.error("reCAPTCHA execution failed", error);
+    } finally {
+      loginRecaptchaRef.current?.reset();
+    }
   }
   
-  function onRegisterSubmit(values: z.infer<typeof registerSchema>) {
-    registerMutation.mutate(values);
+  async function onRegisterSubmit(values: z.infer<typeof registerSchema>) {
+    try {
+      const recaptchaToken = await registerRecaptchaRef.current?.executeAsync();
+      if (recaptchaToken) {
+        registerMutation.mutate({
+          ...values,
+          recaptchaToken
+        });
+      }
+    } catch (error) {
+      console.error("reCAPTCHA execution failed", error);
+    } finally {
+      registerRecaptchaRef.current?.reset();
+    }
+  }
+  
+  async function onResetRequestSubmit(values: z.infer<typeof passwordResetRequestSchema>) {
+    try {
+      const recaptchaToken = await resetRecaptchaRef.current?.executeAsync();
+      if (recaptchaToken) {
+        requestPasswordResetMutation.mutate({
+          ...values,
+          recaptchaToken
+        });
+      }
+    } catch (error) {
+      console.error("reCAPTCHA execution failed", error);
+    } finally {
+      resetRecaptchaRef.current?.reset();
+    }
+  }
+  
+  function onPasswordResetSubmit(values: z.infer<typeof resetPasswordSchema>) {
+    resetPasswordMutation.mutate(values, {
+      onSuccess: () => {
+        // Reset the form and go back to login page
+        resetPasswordForm.reset();
+        setShowPasswordReset(false);
+        setActiveTab("login");
+      }
+    });
   }
   
   // If already logged in, don't show the auth page
@@ -82,7 +187,7 @@ export default function AuthPage() {
         <meta name="description" content="Sign in to your TwitchViewer account or create a new account to boost your Twitch channel with real viewers." />
       </Helmet>
       
-      <div className="min-h-screen flex flex-col bg-neutral-100">
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-zinc-100 to-zinc-200 dark:from-zinc-900 dark:to-zinc-950">
         <Navbar />
         
         <div className="flex-grow flex items-center justify-center py-12">
@@ -91,20 +196,23 @@ export default function AuthPage() {
             {/* Auth Form */}
             <div className="w-full lg:w-1/2 max-w-md mx-auto">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsList className="grid w-full grid-cols-3 mb-4">
                   <TabsTrigger value="login">Sign In</TabsTrigger>
                   <TabsTrigger value="register">Sign Up</TabsTrigger>
+                  <TabsTrigger value="reset" disabled={!showPasswordReset && activeTab !== "forgot"}>
+                    Reset
+                  </TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="login">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Sign In to TwitchViewer</CardTitle>
+                  <Card className="shadow-lg dark:shadow-purple-900/10">
+                    <CardHeader className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-t-lg">
+                      <CardTitle className="text-2xl font-bold text-indigo-900 dark:text-indigo-300">Sign In to TwitchViewer</CardTitle>
                       <CardDescription>
                         Enter your details to access your account.
                       </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-6">
                       <Form {...loginForm}>
                         <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                           <FormField
@@ -133,9 +241,50 @@ export default function AuthPage() {
                               </FormItem>
                             )}
                           />
+                          
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <FormField
+                                control={loginForm.control}
+                                name="remember"
+                                render={({ field }) => (
+                                  <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                    <FormControl>
+                                      <Checkbox 
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                      />
+                                    </FormControl>
+                                    <Label
+                                      htmlFor="remember"
+                                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                      Remember me
+                                    </Label>
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setActiveTab("forgot")}
+                              className="text-sm text-indigo-600 hover:underline"
+                            >
+                              Forgot password?
+                            </button>
+                          </div>
+                          
+                          <div className="hidden">
+                            <ReCAPTCHA 
+                              ref={loginRecaptchaRef}
+                              size="invisible"
+                              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''}
+                            />
+                          </div>
+                          
                           <Button 
                             type="submit" 
-                            className="w-full bg-primary hover:bg-primary-dark"
+                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-3 rounded-md transition-all"
                             disabled={loginMutation.isPending}
                           >
                             {loginMutation.isPending ? (
@@ -145,13 +294,29 @@ export default function AuthPage() {
                           </Button>
                         </form>
                       </Form>
+                      
+                      <div className="mt-6">
+                        <Separator>
+                          <span className="px-2 text-xs text-gray-500">OR</span>
+                        </Separator>
+                        
+                        <div className="mt-4">
+                          <a
+                            href="/api/auth/twitch"
+                            className="flex items-center justify-center gap-2 w-full text-white bg-[#6441a5] hover:bg-[#7d5bbe] font-medium py-3 px-4 rounded-md transition-colors"
+                          >
+                            <SiTwitch className="h-5 w-5" />
+                            <span>Continue with Twitch</span>
+                          </a>
+                        </div>
+                      </div>
                     </CardContent>
-                    <CardFooter className="flex flex-col space-y-2">
+                    <CardFooter className="flex flex-col space-y-2 bg-gray-50 dark:bg-zinc-900/50 rounded-b-lg">
                       <div className="text-sm text-neutral-500">
                         Don't have an account?{" "}
                         <button 
                           onClick={() => setActiveTab("register")}
-                          className="text-primary hover:underline"
+                          className="text-indigo-600 hover:underline"
                         >
                           Sign up here
                         </button>
@@ -161,14 +326,14 @@ export default function AuthPage() {
                 </TabsContent>
                 
                 <TabsContent value="register">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Create an Account</CardTitle>
+                  <Card className="shadow-lg dark:shadow-purple-900/10">
+                    <CardHeader className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-t-lg">
+                      <CardTitle className="text-2xl font-bold text-indigo-900 dark:text-indigo-300">Create an Account</CardTitle>
                       <CardDescription>
                         Fill out the form below to create your TwitchViewer account.
                       </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-6">
                       <Form {...registerForm}>
                         <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
                           <FormField
@@ -223,9 +388,18 @@ export default function AuthPage() {
                               </FormItem>
                             )}
                           />
+                          
+                          <div className="hidden">
+                            <ReCAPTCHA 
+                              ref={registerRecaptchaRef}
+                              size="invisible"
+                              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''}
+                            />
+                          </div>
+                          
                           <Button 
                             type="submit" 
-                            className="w-full bg-primary hover:bg-primary-dark"
+                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-3 rounded-md transition-all"
                             disabled={registerMutation.isPending}
                           >
                             {registerMutation.isPending ? (
@@ -235,13 +409,29 @@ export default function AuthPage() {
                           </Button>
                         </form>
                       </Form>
+                      
+                      <div className="mt-6">
+                        <Separator>
+                          <span className="px-2 text-xs text-gray-500">OR</span>
+                        </Separator>
+                        
+                        <div className="mt-4">
+                          <a
+                            href="/api/auth/twitch"
+                            className="flex items-center justify-center gap-2 w-full text-white bg-[#6441a5] hover:bg-[#7d5bbe] font-medium py-3 px-4 rounded-md transition-colors"
+                          >
+                            <SiTwitch className="h-5 w-5" />
+                            <span>Continue with Twitch</span>
+                          </a>
+                        </div>
+                      </div>
                     </CardContent>
-                    <CardFooter className="flex flex-col space-y-2">
+                    <CardFooter className="flex flex-col space-y-2 bg-gray-50 dark:bg-zinc-900/50 rounded-b-lg">
                       <div className="text-sm text-neutral-500">
                         Already have an account?{" "}
                         <button 
                           onClick={() => setActiveTab("login")}
-                          className="text-primary hover:underline"
+                          className="text-indigo-600 hover:underline"
                         >
                           Sign in here
                         </button>
@@ -249,45 +439,181 @@ export default function AuthPage() {
                     </CardFooter>
                   </Card>
                 </TabsContent>
+                
+                <TabsContent value="forgot">
+                  <Card className="shadow-lg dark:shadow-purple-900/10">
+                    <CardHeader>
+                      <div className="flex items-center mb-2">
+                        <button 
+                          onClick={() => setActiveTab("login")} 
+                          className="mr-2 text-gray-500 hover:text-gray-700"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                        </button>
+                        <CardTitle>Reset Your Password</CardTitle>
+                      </div>
+                      <CardDescription>
+                        Enter your email address and we'll send you a link to reset your password.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Form {...resetRequestForm}>
+                        <form onSubmit={resetRequestForm.handleSubmit(onResetRequestSubmit)} className="space-y-4">
+                          <FormField
+                            control={resetRequestForm.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                  <Input type="email" placeholder="Your email address" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <div className="hidden">
+                            <ReCAPTCHA 
+                              ref={resetRecaptchaRef}
+                              size="invisible"
+                              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''}
+                            />
+                          </div>
+                          
+                          <Button 
+                            type="submit" 
+                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+                            disabled={requestPasswordResetMutation.isPending}
+                          >
+                            {requestPasswordResetMutation.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            ) : null}
+                            Send Reset Link
+                          </Button>
+                        </form>
+                      </Form>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="reset">
+                  <Card className="shadow-lg dark:shadow-purple-900/10">
+                    <CardHeader>
+                      <CardTitle>Set New Password</CardTitle>
+                      <CardDescription>
+                        Create a new password for your account.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Form {...resetPasswordForm}>
+                        <form onSubmit={resetPasswordForm.handleSubmit(onPasswordResetSubmit)} className="space-y-4">
+                          <FormField
+                            control={resetPasswordForm.control}
+                            name="newPassword"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>New Password</FormLabel>
+                                <FormControl>
+                                  <Input type="password" placeholder="Create a new password" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={resetPasswordForm.control}
+                            name="confirmPassword"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Confirm Password</FormLabel>
+                                <FormControl>
+                                  <Input type="password" placeholder="Confirm your new password" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <Button 
+                            type="submit" 
+                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+                            disabled={resetPasswordMutation.isPending}
+                          >
+                            {resetPasswordMutation.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            ) : null}
+                            Reset Password
+                          </Button>
+                        </form>
+                      </Form>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
               </Tabs>
             </div>
             
             {/* Hero Section */}
             <div className="w-full lg:w-1/2 flex items-center">
-              <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 w-full">
-                <div className="text-center lg:text-left">
-                  <h1 className="text-3xl font-bold text-primary mb-4">
-                    Boost Your Twitch Channel Today
-                  </h1>
-                  <p className="text-neutral-600 mb-6">
-                    Join thousands of streamers who have increased their visibility and grown their audience with TwitchViewer.
+              <div className="p-8 rounded-xl bg-gradient-to-br from-indigo-600/80 to-purple-700/80 shadow-lg w-full text-white relative overflow-hidden">
+                <div className="absolute inset-0 bg-grid-pattern bg-[length:20px_20px] opacity-20"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/60 to-transparent"></div>
+                
+                {/* Animated bubble decorations */}
+                <div className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-xl animate-blob"></div>
+                <div className="absolute bottom-20 right-10 w-24 h-24 bg-purple-400/10 rounded-full blur-xl animate-blob animation-delay-2000"></div>
+                <div className="absolute bottom-40 left-20 w-36 h-36 bg-indigo-400/10 rounded-full blur-xl animate-blob animation-delay-4000"></div>
+                
+                <div className="relative z-10 text-center lg:text-left">
+                  <div className="flex items-center justify-center lg:justify-start mb-6">
+                    <LucideRocket className="h-8 w-8 mr-3 text-indigo-300" />
+                    <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-indigo-200">
+                      Boost Your Twitch Success
+                    </h1>
+                  </div>
+                  
+                  <p className="text-indigo-100 mb-8 text-lg max-w-lg">
+                    Join thousands of streamers who have increased their visibility and grown their audience with our premium Twitch services.
                   </p>
-                  <ul className="space-y-2 mb-6 text-left max-w-md mx-auto lg:mx-0">
-                    <li className="flex items-start">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-success mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span>Real viewers for your Twitch channel</span>
-                    </li>
-                    <li className="flex items-start">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-success mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span>Simple setup in less than 5 minutes</span>
-                    </li>
-                    <li className="flex items-start">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-success mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span>Detailed analytics and performance tracking</span>
-                    </li>
-                    <li className="flex items-start">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-success mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span>24/7 expert support team</span>
-                    </li>
-                  </ul>
+                  
+                  <div className="space-y-4 mb-8 text-left max-w-md mx-auto lg:mx-0">
+                    <div className="flex items-start bg-white/10 p-3 rounded-lg backdrop-blur-sm">
+                      <div className="bg-indigo-500 p-1 rounded mr-3 mt-0.5">
+                        <Check className="h-4 w-4 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium">Real Viewers</h3>
+                        <p className="text-sm text-indigo-200">Boost your channel's visibility with our authentic viewer service</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start bg-white/10 p-3 rounded-lg backdrop-blur-sm">
+                      <div className="bg-indigo-500 p-1 rounded mr-3 mt-0.5">
+                        <Check className="h-4 w-4 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium">Interactive Chat Bots</h3>
+                        <p className="text-sm text-indigo-200">Engage your audience with smart, responsive chat interactions</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start bg-white/10 p-3 rounded-lg backdrop-blur-sm">
+                      <div className="bg-indigo-500 p-1 rounded mr-3 mt-0.5">
+                        <Check className="h-4 w-4 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium">Follower Growth</h3>
+                        <p className="text-sm text-indigo-200">Build your channel with our targeted follower service</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-white">
+                    <div className="flex items-center">
+                      <SiTwitch className="h-5 w-5 mr-2 text-[#6441a5]" />
+                      <span className="font-medium">Trusted by 10,000+ streamers</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
