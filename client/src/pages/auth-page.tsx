@@ -20,6 +20,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { SiTwitch } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
 
+// reCAPTCHA window extension
+declare global {
+  interface Window { 
+    grecaptcha: any;
+    onloadCallback: () => void;
+  }
+}
+
 const loginSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -46,6 +54,23 @@ export default function AuthPage() {
   const loginRecaptchaRef = useRef<ReCAPTCHA>(null);
   const registerRecaptchaRef = useRef<ReCAPTCHA>(null);
   const resetRecaptchaRef = useRef<ReCAPTCHA>(null);
+  
+  // reCAPTCHA setup for the browser environment
+  const RECAPTCHA_SITE_KEY = '6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV'; // Fallback if env not available
+  const [recaptchaReady, setRecaptchaReady] = useState(false);
+  
+  useEffect(() => {
+    // Check if reCAPTCHA is properly loaded
+    const interval = setInterval(() => {
+      if (window.grecaptcha && window.grecaptcha.render) {
+        clearInterval(interval);
+        setRecaptchaReady(true);
+        console.log("reCAPTCHA is available in the browser");
+      }
+    }, 100);
+    
+    return () => clearInterval(interval);
+  }, []);
   
   // Redirect if already logged in
   useEffect(() => {
@@ -304,19 +329,31 @@ export default function AuthPage() {
                           
                           <div className="mt-4 flex flex-col items-center">
                             <div className="recaptcha-container mb-2">
-                              <ReCAPTCHA 
-                                ref={loginRecaptchaRef}
-                                sitekey="6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV"
-                                size="normal"
-                                theme="light"
-                                onChange={(token) => {
-                                  console.log("reCAPTCHA token:", token);
-                                }}
-                              />
+                              {recaptchaReady ? (
+                                <ReCAPTCHA 
+                                  ref={loginRecaptchaRef}
+                                  sitekey={RECAPTCHA_SITE_KEY}
+                                  size="normal"
+                                  theme="light"
+                                  onChange={(token) => {
+                                    console.log("reCAPTCHA token:", token);
+                                  }}
+                                />
+                              ) : (
+                                <div className="h-[78px] w-[304px] border border-gray-300 rounded bg-gray-100 flex items-center justify-center">
+                                  <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
+                                </div>
+                              )}
                             </div>
-                            <div className="text-xs text-amber-600 italic">
-                              Please verify you're not a robot by completing the reCAPTCHA
-                            </div>
+                            {recaptchaReady ? (
+                              <div className="text-xs text-amber-600 italic">
+                                Please verify you're not a robot by completing the reCAPTCHA
+                              </div>
+                            ) : (
+                              <div className="text-xs text-blue-600 italic">
+                                Loading reCAPTCHA verification...
+                              </div>
+                            )}
                           </div>
                           
                           <Button 
@@ -428,19 +465,31 @@ export default function AuthPage() {
                           
                           <div className="mt-4 flex flex-col items-center">
                             <div className="recaptcha-container mb-2">
-                              <ReCAPTCHA 
-                                ref={registerRecaptchaRef}
-                                sitekey="6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV"
-                                size="normal"
-                                theme="light"
-                                onChange={(token) => {
-                                  console.log("reCAPTCHA token:", token);
-                                }}
-                              />
+                              {recaptchaReady ? (
+                                <ReCAPTCHA 
+                                  ref={registerRecaptchaRef}
+                                  sitekey={RECAPTCHA_SITE_KEY}
+                                  size="normal"
+                                  theme="light"
+                                  onChange={(token) => {
+                                    console.log("reCAPTCHA token:", token);
+                                  }}
+                                />
+                              ) : (
+                                <div className="h-[78px] w-[304px] border border-gray-300 rounded bg-gray-100 flex items-center justify-center">
+                                  <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
+                                </div>
+                              )}
                             </div>
-                            <div className="text-xs text-amber-600 italic">
-                              Please verify you're not a robot by completing the reCAPTCHA
-                            </div>
+                            {recaptchaReady ? (
+                              <div className="text-xs text-amber-600 italic">
+                                Please verify you're not a robot by completing the reCAPTCHA
+                              </div>
+                            ) : (
+                              <div className="text-xs text-blue-600 italic">
+                                Loading reCAPTCHA verification...
+                              </div>
+                            )}
                           </div>
                           
                           <Button 
@@ -521,19 +570,31 @@ export default function AuthPage() {
                           
                           <div className="mt-4 flex flex-col items-center">
                             <div className="recaptcha-container mb-2">
-                              <ReCAPTCHA 
-                                ref={resetRecaptchaRef}
-                                sitekey="6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV"
-                                size="normal"
-                                theme="light"
-                                onChange={(token) => {
-                                  console.log("reCAPTCHA token:", token);
-                                }}
-                              />
+                              {recaptchaReady ? (
+                                <ReCAPTCHA 
+                                  ref={resetRecaptchaRef}
+                                  sitekey={RECAPTCHA_SITE_KEY}
+                                  size="normal"
+                                  theme="light"
+                                  onChange={(token) => {
+                                    console.log("reCAPTCHA token:", token);
+                                  }}
+                                />
+                              ) : (
+                                <div className="h-[78px] w-[304px] border border-gray-300 rounded bg-gray-100 flex items-center justify-center">
+                                  <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
+                                </div>
+                              )}
                             </div>
-                            <div className="text-xs text-amber-600 italic">
-                              Please verify you're not a robot by completing the reCAPTCHA
-                            </div>
+                            {recaptchaReady ? (
+                              <div className="text-xs text-amber-600 italic">
+                                Please verify you're not a robot by completing the reCAPTCHA
+                              </div>
+                            ) : (
+                              <div className="text-xs text-blue-600 italic">
+                                Loading reCAPTCHA verification...
+                              </div>
+                            )}
                           </div>
                           
                           <Button 
