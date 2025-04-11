@@ -305,7 +305,7 @@ export default function AuthPage() {
                           <div className="mt-4 flex justify-center">
                             <ReCAPTCHA 
                               ref={loginRecaptchaRef}
-                              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''}
+                              sitekey="6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV"
                               size="normal"
                               theme="light"
                             />
@@ -421,7 +421,7 @@ export default function AuthPage() {
                           <div className="mt-4 flex justify-center">
                             <ReCAPTCHA 
                               ref={registerRecaptchaRef}
-                              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''}
+                              sitekey="6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV"
                               size="normal"
                               theme="light"
                             />
@@ -506,7 +506,7 @@ export default function AuthPage() {
                           <div className="mt-4 flex justify-center">
                             <ReCAPTCHA 
                               ref={resetRecaptchaRef}
-                              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''}
+                              sitekey="6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV"
                               size="normal"
                               theme="light"
                             />
