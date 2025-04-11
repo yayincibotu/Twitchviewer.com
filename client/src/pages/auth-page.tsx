@@ -18,6 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SiTwitch } from "react-icons/si";
+import { useToast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -31,6 +32,7 @@ export default function AuthPage() {
   const [showPasswordReset, setShowPasswordReset] = useState(false);
   const [resetToken, setResetToken] = useState("");
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const { 
     user, 
     loginMutation, 
@@ -111,10 +113,20 @@ export default function AuthPage() {
   
   async function onLoginSubmit(values: z.infer<typeof loginSchema>) {
     try {
-      const recaptchaToken = await loginRecaptchaRef.current?.executeAsync();
+      const recaptchaToken = loginRecaptchaRef.current?.getValue();
+      
+      if (!recaptchaToken) {
+        toast({
+          title: "reCAPTCHA Required",
+          description: "Please complete the reCAPTCHA verification before submitting",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       loginMutation.mutate({
         ...values,
-        recaptchaToken: recaptchaToken || undefined
+        recaptchaToken
       });
       
       // If remember me is checked, update the session
@@ -274,10 +286,12 @@ export default function AuthPage() {
                             </button>
                           </div>
                           
-                          <div className="mt-4">
+                          <div className="mt-4 flex justify-center">
                             <ReCAPTCHA 
                               ref={loginRecaptchaRef}
                               sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''}
+                              size="normal"
+                              theme="light"
                             />
                           </div>
                           
@@ -388,10 +402,12 @@ export default function AuthPage() {
                             )}
                           />
                           
-                          <div className="mt-4">
+                          <div className="mt-4 flex justify-center">
                             <ReCAPTCHA 
                               ref={registerRecaptchaRef}
                               sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''}
+                              size="normal"
+                              theme="light"
                             />
                           </div>
                           
@@ -471,10 +487,12 @@ export default function AuthPage() {
                             )}
                           />
                           
-                          <div className="mt-4">
+                          <div className="mt-4 flex justify-center">
                             <ReCAPTCHA 
                               ref={resetRecaptchaRef}
                               sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''}
+                              size="normal"
+                              theme="light"
                             />
                           </div>
                           
