@@ -66,9 +66,8 @@ export const TurnstileWidget = forwardRef<HTMLDivElement, TurnstileProps>(
           key={key}
           turnstileSiteKey={TURNSTILE_SITE_KEY}
           callback={handleVerify}
-          expiredCallback={handleExpire}
-          errorCallback={handleError}
-          id={id}
+          onExpired={handleExpire}
+          onError={handleError}
           theme="auto"
           className="mt-2"
         />
