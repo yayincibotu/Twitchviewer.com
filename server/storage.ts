@@ -105,7 +105,7 @@ export interface IStorage {
   deleteLimitedTimeOffer(id: number): Promise<boolean>;
   
   // Session store
-  sessionStore: session.SessionStore;
+  sessionStore: any;
 }
 
 export class MemStorage implements IStorage {
@@ -120,7 +120,7 @@ export class MemStorage implements IStorage {
   private securityBadges: Map<number, SecurityBadge>;
   private limitedTimeOffers: Map<number, LimitedTimeOffer>;
   
-  sessionStore: session.SessionStore;
+  sessionStore: any;
   currentUserId: number;
   currentPackageId: number;
   currentSeoSettingsId: number;
@@ -948,4 +948,439 @@ By implementing these strategies consistently, you'll be well on your way to gro
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  sessionStore: any;
+
+  constructor() {
+    this.sessionStore = new PostgresSessionStore({
+      pool,
+      createTableIfMissing: true
+    });
+  }
+
+  // User operations
+  async getUser(id: number): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.username, username)).limit(1);
+    return result[0];
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    return result[0];
+  }
+
+  async getUserByTwitchId(twitchId: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.twitchId, twitchId)).limit(1);
+    return result[0];
+  }
+
+  async getUserByPasswordResetToken(token: string): Promise<User | undefined> {
+    const now = new Date();
+    const result = await db.select().from(users)
+      .where(
+        and(
+          eq(users.passwordResetToken, token),
+          gte(users.passwordResetExpires, now)
+        )
+      )
+      .limit(1);
+    return result[0];
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const result = await db.insert(users).values(insertUser).returning();
+    return result[0];
+  }
+
+  async verifyUserEmail(id: number): Promise<User | undefined> {
+    const result = await db
+      .update(users)
+      .set({ emailVerified: true })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async updateUserRole(id: number, role: string): Promise<User | undefined> {
+    const result = await db
+      .update(users)
+      .set({ role })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async updateUserStripeInfo(id: number, stripeInfo: { stripeCustomerId: string, stripeSubscriptionId: string }): Promise<User | undefined> {
+    const result = await db
+      .update(users)
+      .set({
+        stripeCustomerId: stripeInfo.stripeCustomerId,
+        stripeSubscriptionId: stripeInfo.stripeSubscriptionId
+      })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async setPasswordResetToken(email: string): Promise<{ token: string, expires: Date } | undefined> {
+    const user = await this.getUserByEmail(email);
+    if (!user) return undefined;
+
+    const token = randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 3600000); // 1 hour from now
+
+    await db
+      .update(users)
+      .set({
+        passwordResetToken: token,
+        passwordResetExpires: expires
+      })
+      .where(eq(users.id, user.id));
+
+    return { token, expires };
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<User | undefined> {
+    const user = await this.getUserByPasswordResetToken(token);
+    if (!user) return undefined;
+
+    const result = await db
+      .update(users)
+      .set({
+        password: newPassword,
+        passwordResetToken: null,
+        passwordResetExpires: null
+      })
+      .where(eq(users.id, user.id))
+      .returning();
+
+    return result[0];
+  }
+
+  async createOrUpdateTwitchUser(twitchData: { twitchId: string, username: string, email: string, accessToken: string, refreshToken: string }): Promise<User> {
+    const existingUser = await this.getUserByTwitchId(twitchData.twitchId);
+
+    if (existingUser) {
+      const result = await db
+        .update(users)
+        .set({
+          twitchAccessToken: twitchData.accessToken,
+          twitchRefreshToken: twitchData.refreshToken
+        })
+        .where(eq(users.id, existingUser.id))
+        .returning();
+      return result[0];
+    } else {
+      // Check if user exists with the same email
+      const userByEmail = await this.getUserByEmail(twitchData.email);
+      
+      if (userByEmail) {
+        // Update existing user with Twitch information
+        const result = await db
+          .update(users)
+          .set({
+            twitchId: twitchData.twitchId,
+            twitchAccessToken: twitchData.accessToken,
+            twitchRefreshToken: twitchData.refreshToken
+          })
+          .where(eq(users.id, userByEmail.id))
+          .returning();
+        return result[0];
+      } else {
+        // Create a new user with Twitch information
+        const randomPassword = randomBytes(16).toString('hex');
+        const newUser = await this.createUser({
+          username: twitchData.username,
+          email: twitchData.email,
+          password: randomPassword,
+          twitchId: twitchData.twitchId,
+          twitchAccessToken: twitchData.accessToken,
+          twitchRefreshToken: twitchData.refreshToken,
+          emailVerified: true // Auto-verify users who sign in with Twitch
+        });
+        return newUser;
+      }
+    }
+  }
+
+  async updateRememberedSession(id: number, remembered: boolean): Promise<User | undefined> {
+    const result = await db
+      .update(users)
+      .set({ rememberedSession: remembered })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
+  }
+
+  // Package operations
+  async getPackages(): Promise<Package[]> {
+    return await db.select().from(packages).orderBy(packages.price);
+  }
+
+  async getPackage(id: number): Promise<Package | undefined> {
+    const result = await db.select().from(packages).where(eq(packages.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createPackage(pkg: InsertPackage): Promise<Package> {
+    const result = await db.insert(packages).values(pkg).returning();
+    return result[0];
+  }
+
+  async updatePackage(id: number, pkg: Partial<InsertPackage>): Promise<Package | undefined> {
+    const result = await db.update(packages).set(pkg).where(eq(packages.id, id)).returning();
+    return result[0];
+  }
+
+  async deletePackage(id: number): Promise<boolean> {
+    const result = await db.delete(packages).where(eq(packages.id, id));
+    return result.count > 0;
+  }
+
+  // SEO Settings operations
+  async getSeoSettings(pageSlug: string): Promise<SeoSettings | undefined> {
+    const result = await db.select().from(seoSettings).where(eq(seoSettings.pageSlug, pageSlug)).limit(1);
+    return result[0];
+  }
+
+  async getAllSeoSettings(): Promise<SeoSettings[]> {
+    return await db.select().from(seoSettings);
+  }
+
+  async createSeoSettings(settings: InsertSeoSettings): Promise<SeoSettings> {
+    const result = await db.insert(seoSettings).values(settings).returning();
+    return result[0];
+  }
+
+  async updateSeoSettings(id: number, settings: Partial<InsertSeoSettings>): Promise<SeoSettings | undefined> {
+    const result = await db.update(seoSettings).set(settings).where(eq(seoSettings.id, id)).returning();
+    return result[0];
+  }
+
+  // Statistics operations
+  async getStatistics(): Promise<Statistic[]> {
+    return await db.select().from(statistics).orderBy(statistics.order);
+  }
+
+  async getActiveStatistics(): Promise<Statistic[]> {
+    return await db.select().from(statistics).where(eq(statistics.isActive, true)).orderBy(statistics.order);
+  }
+
+  async getStatistic(id: number): Promise<Statistic | undefined> {
+    const result = await db.select().from(statistics).where(eq(statistics.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createStatistic(statistic: InsertStatistic): Promise<Statistic> {
+    const result = await db.insert(statistics).values(statistic).returning();
+    return result[0];
+  }
+
+  async updateStatistic(id: number, statistic: Partial<InsertStatistic>): Promise<Statistic | undefined> {
+    const result = await db.update(statistics).set(statistic).where(eq(statistics.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteStatistic(id: number): Promise<boolean> {
+    const result = await db.delete(statistics).where(eq(statistics.id, id));
+    return result.count > 0;
+  }
+
+  // Success Stories operations
+  async getSuccessStories(): Promise<SuccessStory[]> {
+    return await db.select().from(successStories).orderBy(successStories.order);
+  }
+
+  async getVisibleSuccessStories(): Promise<SuccessStory[]> {
+    return await db.select().from(successStories).where(eq(successStories.isVisible, true)).orderBy(successStories.order);
+  }
+
+  async getSuccessStory(id: number): Promise<SuccessStory | undefined> {
+    const result = await db.select().from(successStories).where(eq(successStories.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createSuccessStory(story: InsertSuccessStory): Promise<SuccessStory> {
+    const result = await db.insert(successStories).values(story).returning();
+    return result[0];
+  }
+
+  async updateSuccessStory(id: number, story: Partial<InsertSuccessStory>): Promise<SuccessStory | undefined> {
+    const result = await db.update(successStories).set(story).where(eq(successStories.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteSuccessStory(id: number): Promise<boolean> {
+    const result = await db.delete(successStories).where(eq(successStories.id, id));
+    return result.count > 0;
+  }
+
+  // FAQ operations
+  async getFaqCategories(): Promise<FaqCategory[]> {
+    return await db.select().from(faqCategories).orderBy(faqCategories.order);
+  }
+
+  async getFaqCategory(id: number): Promise<FaqCategory | undefined> {
+    const result = await db.select().from(faqCategories).where(eq(faqCategories.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createFaqCategory(category: InsertFaqCategory): Promise<FaqCategory> {
+    const result = await db.insert(faqCategories).values(category).returning();
+    return result[0];
+  }
+
+  async updateFaqCategory(id: number, category: Partial<InsertFaqCategory>): Promise<FaqCategory | undefined> {
+    const result = await db.update(faqCategories).set(category).where(eq(faqCategories.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteFaqCategory(id: number): Promise<boolean> {
+    const result = await db.delete(faqCategories).where(eq(faqCategories.id, id));
+    return result.count > 0;
+  }
+
+  async getFaqItems(): Promise<FaqItem[]> {
+    return await db.select().from(faqItems).orderBy(faqItems.order);
+  }
+
+  async getFaqItemsByCategory(categoryId: number): Promise<FaqItem[]> {
+    return await db.select().from(faqItems).where(eq(faqItems.categoryId, categoryId)).orderBy(faqItems.order);
+  }
+
+  async getFaqItem(id: number): Promise<FaqItem | undefined> {
+    const result = await db.select().from(faqItems).where(eq(faqItems.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createFaqItem(item: InsertFaqItem): Promise<FaqItem> {
+    const result = await db.insert(faqItems).values(item).returning();
+    return result[0];
+  }
+
+  async updateFaqItem(id: number, item: Partial<InsertFaqItem>): Promise<FaqItem | undefined> {
+    const result = await db.update(faqItems).set(item).where(eq(faqItems.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteFaqItem(id: number): Promise<boolean> {
+    const result = await db.delete(faqItems).where(eq(faqItems.id, id));
+    return result.count > 0;
+  }
+
+  // Blog operations
+  async getBlogPosts(): Promise<BlogPost[]> {
+    return await db.select().from(blogPosts).orderBy(blogPosts.publishDate, 'desc');
+  }
+
+  async getPublishedBlogPosts(): Promise<BlogPost[]> {
+    const now = new Date();
+    return await db.select().from(blogPosts)
+      .where(
+        and(
+          eq(blogPosts.isPublished, true),
+          lt(blogPosts.publishDate, now)
+        )
+      )
+      .orderBy(blogPosts.publishDate, 'desc');
+  }
+
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    const result = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug)).limit(1);
+    return result[0];
+  }
+
+  async getBlogPost(id: number): Promise<BlogPost | undefined> {
+    const result = await db.select().from(blogPosts).where(eq(blogPosts.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
+    const result = await db.insert(blogPosts).values(post).returning();
+    return result[0];
+  }
+
+  async updateBlogPost(id: number, post: Partial<InsertBlogPost>): Promise<BlogPost | undefined> {
+    const result = await db.update(blogPosts).set(post).where(eq(blogPosts.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteBlogPost(id: number): Promise<boolean> {
+    const result = await db.delete(blogPosts).where(eq(blogPosts.id, id));
+    return result.count > 0;
+  }
+
+  // Security Badges operations
+  async getSecurityBadges(): Promise<SecurityBadge[]> {
+    return await db.select().from(securityBadges).orderBy(securityBadges.order);
+  }
+
+  async getActiveSecurityBadges(): Promise<SecurityBadge[]> {
+    return await db.select().from(securityBadges).where(eq(securityBadges.isActive, true)).orderBy(securityBadges.order);
+  }
+
+  async getSecurityBadge(id: number): Promise<SecurityBadge | undefined> {
+    const result = await db.select().from(securityBadges).where(eq(securityBadges.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createSecurityBadge(badge: InsertSecurityBadge): Promise<SecurityBadge> {
+    const result = await db.insert(securityBadges).values(badge).returning();
+    return result[0];
+  }
+
+  async updateSecurityBadge(id: number, badge: Partial<InsertSecurityBadge>): Promise<SecurityBadge | undefined> {
+    const result = await db.update(securityBadges).set(badge).where(eq(securityBadges.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteSecurityBadge(id: number): Promise<boolean> {
+    const result = await db.delete(securityBadges).where(eq(securityBadges.id, id));
+    return result.count > 0;
+  }
+
+  // Limited Time Offers operations
+  async getLimitedTimeOffers(): Promise<LimitedTimeOffer[]> {
+    return await db.select().from(limitedTimeOffers);
+  }
+
+  async getActiveLimitedTimeOffers(): Promise<LimitedTimeOffer[]> {
+    const now = new Date();
+    return await db.select().from(limitedTimeOffers)
+      .where(
+        and(
+          eq(limitedTimeOffers.isActive, true),
+          lt(limitedTimeOffers.startDate, now),
+          gte(limitedTimeOffers.endDate, now)
+        )
+      );
+  }
+
+  async getLimitedTimeOffer(id: number): Promise<LimitedTimeOffer | undefined> {
+    const result = await db.select().from(limitedTimeOffers).where(eq(limitedTimeOffers.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createLimitedTimeOffer(offer: InsertLimitedTimeOffer): Promise<LimitedTimeOffer> {
+    const result = await db.insert(limitedTimeOffers).values(offer).returning();
+    return result[0];
+  }
+
+  async updateLimitedTimeOffer(id: number, offer: Partial<InsertLimitedTimeOffer>): Promise<LimitedTimeOffer | undefined> {
+    const result = await db.update(limitedTimeOffers).set(offer).where(eq(limitedTimeOffers.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteLimitedTimeOffer(id: number): Promise<boolean> {
+    const result = await db.delete(limitedTimeOffers).where(eq(limitedTimeOffers.id, id));
+    return result.count > 0;
+  }
+}
+
+// Use DatabaseStorage for persistence
+export const storage = new DatabaseStorage();
