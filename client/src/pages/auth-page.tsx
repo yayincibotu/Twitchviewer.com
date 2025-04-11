@@ -1,12 +1,19 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Helmet } from "react-helmet";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
+import { Helmet } from "react-helmet";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth, registerSchema, passwordResetRequestSchema, resetPasswordSchema } from "@/hooks/use-auth";
@@ -262,7 +269,6 @@ export default function AuthPage() {
                               <FormItem>
                                 <FormLabel>Security Verification</FormLabel>
                                 <FormControl>
-                                  {/* Yeni BasicTurnstile bileşenini kullan */}
                                   <div>
                                     <BasicTurnstile
                                       onVerify={(token: string) => {
@@ -399,10 +405,19 @@ export default function AuthPage() {
                               <FormItem>
                                 <FormLabel>Security Verification</FormLabel>
                                 <FormControl>
-                                  <TurnstileWidget
-                                    onVerify={(token) => field.onChange(token)}
-                                    onExpire={() => field.onChange("")}
-                                    onError={() => field.onChange("")}
+                                  <BasicTurnstile
+                                    onVerify={(token: string) => {
+                                      console.log("Turnstile register verification success, token length:", token?.length || 0);
+                                      field.onChange(token);
+                                    }}
+                                    onExpire={() => {
+                                      console.log("Turnstile register token expired");
+                                      field.onChange("");
+                                    }}
+                                    onError={(error: string) => {
+                                      console.error("Turnstile register error:", error);
+                                      field.onChange("");
+                                    }}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -493,10 +508,19 @@ export default function AuthPage() {
                               <FormItem>
                                 <FormLabel>Security Verification</FormLabel>
                                 <FormControl>
-                                  <TurnstileWidget
-                                    onVerify={(token) => field.onChange(token)}
-                                    onExpire={() => field.onChange("")}
-                                    onError={() => field.onChange("")}
+                                  <BasicTurnstile
+                                    onVerify={(token: string) => {
+                                      console.log("Turnstile reset verification success, token length:", token?.length || 0);
+                                      field.onChange(token);
+                                    }}
+                                    onExpire={() => {
+                                      console.log("Turnstile reset token expired");
+                                      field.onChange("");
+                                    }}
+                                    onError={(error: string) => {
+                                      console.error("Turnstile reset error:", error);
+                                      field.onChange("");
+                                    }}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -577,64 +601,61 @@ export default function AuthPage() {
             </div>
             
             {/* Hero Section */}
-            <div className="w-full lg:w-1/2 flex items-center">
-              <div className="p-8 rounded-xl bg-gradient-to-br from-indigo-600/80 to-purple-700/80 shadow-lg w-full text-white relative overflow-hidden">
-                <div className="absolute inset-0 bg-grid-pattern bg-[length:20px_20px] opacity-20"></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/60 to-transparent"></div>
-                
-                {/* Animated bubble decorations */}
-                <div className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-xl animate-blob"></div>
-                <div className="absolute bottom-20 right-10 w-24 h-24 bg-purple-400/10 rounded-full blur-xl animate-blob animation-delay-2000"></div>
-                <div className="absolute bottom-40 left-20 w-36 h-36 bg-indigo-400/10 rounded-full blur-xl animate-blob animation-delay-4000"></div>
-                
-                <div className="relative z-10 text-center lg:text-left">
-                  <div className="flex items-center justify-center lg:justify-start mb-6">
-                    <LucideRocket className="h-8 w-8 mr-3 text-indigo-300" />
-                    <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-indigo-200">
-                      Boost Your Twitch Success
-                    </h1>
+            <div className="w-full lg:w-1/2 flex flex-col justify-center">
+              <div className="space-y-6 text-center lg:text-left">
+                <div className="flex justify-center lg:justify-start">
+                  <div className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-2 rounded-md">
+                    <LucideRocket className="h-5 w-5" />
+                    <span className="text-sm font-medium">Premium Service</span>
                   </div>
-                  
-                  <p className="text-indigo-100 mb-8 text-lg max-w-lg">
-                    Join thousands of streamers who have increased their visibility and grown their audience with our premium Twitch services.
-                  </p>
-                  
-                  <div className="space-y-4 mb-8 text-left max-w-md mx-auto lg:mx-0">
-                    <div className="flex items-start bg-white/10 p-3 rounded-lg backdrop-blur-sm">
-                      <div className="bg-indigo-500 p-1 rounded mr-3 mt-0.5">
-                        <Check className="h-4 w-4 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium">Real Viewers</h3>
-                        <p className="text-sm text-indigo-200">Boost your channel's visibility with our authentic viewer service</p>
-                      </div>
+                </div>
+                
+                <h1 className="text-4xl lg:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                  Boost Your Twitch Audience Today
+                </h1>
+                
+                <p className="text-lg text-zinc-600 dark:text-zinc-400">
+                  Accelerate your channel growth with our comprehensive viewer, chat, and follower solutions designed for Twitch streamers.
+                </p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto lg:mx-0">
+                  <div className="flex items-start gap-3 bg-white dark:bg-zinc-900 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-zinc-800">
+                    <div className="rounded-full p-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400">
+                      <Check className="h-5 w-5" />
                     </div>
-                    
-                    <div className="flex items-start bg-white/10 p-3 rounded-lg backdrop-blur-sm">
-                      <div className="bg-indigo-500 p-1 rounded mr-3 mt-0.5">
-                        <Check className="h-4 w-4 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium">Interactive Chat Bots</h3>
-                        <p className="text-sm text-indigo-200">Engage your audience with smart, responsive chat interactions</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start bg-white/10 p-3 rounded-lg backdrop-blur-sm">
-                      <div className="bg-indigo-500 p-1 rounded mr-3 mt-0.5">
-                        <Check className="h-4 w-4 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium">Follower Growth</h3>
-                        <p className="text-sm text-indigo-200">Build your channel with our targeted follower service</p>
-                      </div>
+                    <div>
+                      <h3 className="font-medium">Real Engagement</h3>
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">Genuine viewers that interact naturally with your content</p>
                     </div>
                   </div>
                   
-                  <div className="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg text-white">
-                    <div className="flex items-center">
-                      <SiTwitch className="h-5 w-5 mr-2 text-[#6441a5]" />
-                      <span className="font-medium">Trusted by 10,000+ streamers</span>
+                  <div className="flex items-start gap-3 bg-white dark:bg-zinc-900 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-zinc-800">
+                    <div className="rounded-full p-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400">
+                      <Check className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">24/7 Support</h3>
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">Our team is available around the clock to help you succeed</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 bg-white dark:bg-zinc-900 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-zinc-800">
+                    <div className="rounded-full p-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400">
+                      <Check className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Safe & Secure</h3>
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">Compliant with Twitch TOS for safety and peace of mind</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 bg-white dark:bg-zinc-900 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-zinc-800">
+                    <div className="rounded-full p-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400">
+                      <Check className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Flexible Plans</h3>
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">Choose the perfect package for your streaming goals</p>
                     </div>
                   </div>
                 </div>
