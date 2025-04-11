@@ -274,10 +274,9 @@ export default function AuthPage() {
                             </button>
                           </div>
                           
-                          <div className="hidden">
+                          <div className="mt-4">
                             <ReCAPTCHA 
                               ref={loginRecaptchaRef}
-                              size="invisible"
                               sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''}
                             />
                           </div>
@@ -389,10 +388,9 @@ export default function AuthPage() {
                             )}
                           />
                           
-                          <div className="hidden">
+                          <div className="mt-4">
                             <ReCAPTCHA 
                               ref={registerRecaptchaRef}
-                              size="invisible"
                               sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''}
                             />
                           </div>
@@ -473,10 +471,9 @@ export default function AuthPage() {
                             )}
                           />
                           
-                          <div className="hidden">
+                          <div className="mt-4">
                             <ReCAPTCHA 
                               ref={resetRecaptchaRef}
-                              size="invisible"
                               sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''}
                             />
                           </div>
