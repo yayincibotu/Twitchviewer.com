@@ -39,6 +39,39 @@ function generatePasswordResetToken(): string {
   return randomBytes(32).toString('hex');
 }
 
+// Cloudflare Turnstile doğrulama
+async function verifyTurnstile(token: string): Promise<boolean> {
+  if (!process.env.TURNSTILE_SECRET_KEY) {
+    console.error('TURNSTILE_SECRET_KEY is not configured');
+    return false;
+  }
+
+  try {
+    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        secret: process.env.TURNSTILE_SECRET_KEY,
+        response: token,
+      }),
+    });
+
+    const data = await response.json() as { success: boolean, 'error-codes'?: string[] };
+    
+    if (!data.success) {
+      console.error('Turnstile validation failed:', data['error-codes']);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Turnstile validation error:', error);
+    return false;
+  }
+}
+
 export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "twitchviewer-session-secret",
@@ -75,7 +108,17 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res, next) => {
     try {
-      const { username, email, password } = req.body;
+      const { username, email, password, turnstileToken } = req.body;
+      
+      // Verify Turnstile Token
+      if (!turnstileToken) {
+        return res.status(400).json({ message: "Turnstile verification required" });
+      }
+      
+      const isValidTurnstile = await verifyTurnstile(turnstileToken);
+      if (!isValidTurnstile) {
+        return res.status(400).json({ message: "Turnstile verification failed" });
+      }
       
       // Check if username already exists
       const existingUsername = await storage.getUserByUsername(username);
@@ -119,10 +162,43 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/login", passport.authenticate("local"), (req, res) => {
-    // Don't send the password back to the client
-    const { password, ...userWithoutPassword } = req.user as SelectUser;
-    res.status(200).json(userWithoutPassword);
+  app.post("/api/login", async (req, res, next) => {
+    try {
+      const { turnstileToken } = req.body;
+      
+      // Verify Turnstile Token
+      if (!turnstileToken) {
+        return res.status(400).json({ message: "Turnstile verification required" });
+      }
+      
+      const isValidTurnstile = await verifyTurnstile(turnstileToken);
+      if (!isValidTurnstile) {
+        return res.status(400).json({ message: "Turnstile verification failed" });
+      }
+      
+      // Continue with passport authentication
+      passport.authenticate("local", (err, user) => {
+        if (err) {
+          return next(err);
+        }
+        
+        if (!user) {
+          return res.status(401).json({ message: "Invalid username or password" });
+        }
+        
+        req.login(user, (loginErr) => {
+          if (loginErr) {
+            return next(loginErr);
+          }
+          
+          // Don't send the password back to the client
+          const { password, ...userWithoutPassword } = user;
+          res.status(200).json(userWithoutPassword);
+        });
+      })(req, res, next);
+    } catch (error) {
+      next(error);
+    }
   });
 
   app.post("/api/logout", (req, res, next) => {
