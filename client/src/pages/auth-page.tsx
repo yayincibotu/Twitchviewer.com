@@ -295,12 +295,12 @@ export default function AuthPage() {
                         </form>
                       </Form>
                       
-                      <div className="mt-6">
-                        <Separator>
-                          <span className="px-2 text-xs text-gray-500">OR</span>
+                      <div className="mt-8">
+                        <Separator className="flex items-center justify-center">
+                          <span className="px-4 text-xs text-gray-500 bg-white dark:bg-zinc-900">OR</span>
                         </Separator>
                         
-                        <div className="mt-4">
+                        <div className="mt-6">
                           <a
                             href="/api/auth/twitch"
                             className="flex items-center justify-center gap-2 w-full text-white bg-[#6441a5] hover:bg-[#7d5bbe] font-medium py-3 px-4 rounded-md transition-colors"
@@ -410,12 +410,12 @@ export default function AuthPage() {
                         </form>
                       </Form>
                       
-                      <div className="mt-6">
-                        <Separator>
-                          <span className="px-2 text-xs text-gray-500">OR</span>
+                      <div className="mt-8">
+                        <Separator className="flex items-center justify-center">
+                          <span className="px-4 text-xs text-gray-500 bg-white dark:bg-zinc-900">OR</span>
                         </Separator>
                         
-                        <div className="mt-4">
+                        <div className="mt-6">
                           <a
                             href="/api/auth/twitch"
                             className="flex items-center justify-center gap-2 w-full text-white bg-[#6441a5] hover:bg-[#7d5bbe] font-medium py-3 px-4 rounded-md transition-colors"
