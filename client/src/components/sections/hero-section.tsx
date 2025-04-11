@@ -251,25 +251,141 @@ export default function HeroSection({ onGetStarted }: HeroSectionProps) {
             <div className="grid grid-cols-12">
               {/* Main stream view */}
               <div className="col-span-9 relative bg-[#0e0e10]">
-                {/* Game footage - using a forest/nature scene as in the reference */}
+                {/* Game footage - FPS game animation */}
                 <div className="relative w-full aspect-[16/9] overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e10]/80 via-transparent to-transparent"></div>
-                  <div 
-                    className="w-full h-full bg-cover bg-center"
-                    style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&q=80&w=1000)' }}
-                  ></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e10]/80 via-transparent to-transparent z-10"></div>
                   
-                  {/* Streamer webcam overlay */}
-                  <div className="absolute bottom-3 left-3 w-32 h-32 rounded overflow-hidden border-2 border-[#9147ff]">
-                    <div className="w-full h-full bg-cover bg-center bg-[#1f1f23]">
-                      <div className="w-full h-full flex items-end">
+                  {/* FPS game animation */}
+                  <div className="w-full h-full bg-[#18181b] relative overflow-hidden">
+                    {/* Game world with moving elements */}
+                    <div className="absolute inset-0 w-full h-full" 
+                         style={{ 
+                           background: 'linear-gradient(to bottom, #1a2a3a 0%, #2c3e50 100%)'
+                         }}>
+                      
+                      {/* Moving environment elements */}
+                      <div className="absolute top-0 left-0 w-full h-16 opacity-20"
+                           style={{ 
+                             background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)',
+                             animation: 'shine 3s ease-in-out infinite'
+                           }}></div>
+                      
+                      {/* Moving clouds */}
+                      {[...Array(5)].map((_, i) => (
+                        <div 
+                          key={`cloud-${i}`}
+                          className="absolute bg-white/5 rounded-full"
+                          style={{
+                            width: `${Math.floor(Math.random() * 120) + 40}px`,
+                            height: `${Math.floor(Math.random() * 40) + 15}px`,
+                            top: `${Math.floor(Math.random() * 40)}%`,
+                            left: `${Math.floor(Math.random() * 100)}%`,
+                            animation: `float ${Math.floor(Math.random() * 10) + 15}s linear infinite`,
+                            animationDelay: `${Math.floor(Math.random() * 5)}s`,
+                            opacity: 0.1 + Math.random() * 0.1,
+                            transform: 'translateX(-100%)'
+                          }}
+                        ></div>
+                      ))}
+                      
+                      {/* Game terrain/landscape */}
+                      <div className="absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-[#101418] to-transparent"></div>
+                      
+                      {/* FPS weapon view */}
+                      <div className="absolute bottom-0 right-1/2 transform translate-x-1/2">
+                        <div className="relative w-64 h-32 mb-[-10px]">
+                          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-48 h-16 
+                                         bg-gradient-to-t from-[#4a4a4a] to-[#2a2a2a] rounded-t-lg
+                                         shadow-lg">
+                            {/* Gun details */}
+                            <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-40 h-1 bg-[#555] rounded-full"></div>
+                            <div className="absolute top-3 left-1/2 transform -translate-x-1/2 w-36 h-1 bg-[#444] rounded-full"></div>
+                            
+                            {/* Gun animation */}
+                            <div className="w-full h-full animate-pulse-fast" style={{ animationDuration: '3s' }}></div>
+                            
+                            {/* Gun sight */}
+                            <div className="absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+                              <div className="w-1 h-6 bg-red-500/30"></div>
+                              <div className="w-6 h-1 bg-red-500/30"></div>
+                              <div className="absolute w-1.5 h-1.5 rounded-full border border-red-500/50"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* HUD Elements */}
+                      <div className="absolute top-4 right-4 flex items-center text-[#39ff14] text-xs font-mono">
+                        <div className="mr-3">
+                          <div>AMMO: 24/96</div>
+                          <div>HEALTH: 85</div>
+                        </div>
+                        <div className="w-12 h-12 border border-[#39ff14]/30 rounded-full flex items-center justify-center">
+                          <div className="w-10 h-10 border border-[#39ff14]/50 rounded-full flex items-center justify-center">
+                            <div className="w-3 h-3 bg-[#39ff14] rounded-full animate-ping opacity-70"></div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Muzzle flash animation that occasionally appears */}
+                      {Math.random() > 0.7 && (
+                        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 
+                                        w-20 h-16 bg-yellow-500/30 rounded-full filter blur-sm animate-pulse"
+                             style={{ animationDuration: '0.1s' }}>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Animated Streamer webcam overlay */}
+                  <div className="absolute bottom-3 left-3 w-32 h-32 rounded overflow-hidden border-2 border-[#9147ff] z-20">
+                    <div className="w-full h-full bg-[#1f1f23] relative">
+                      {/* Animated streamer */}
+                      <div className="absolute inset-0 w-full h-full flex flex-col justify-end">
+                        {/* Streamer animation - a simple reactive animation that mimics someone playing an FPS */}
+                        <div className="h-2/3 flex items-end">
+                          <div className="w-full h-[70%] relative">
+                            {/* Streamer head/shoulders silhouette */}
+                            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-16 h-16">
+                              <div className="absolute bottom-0 w-10 h-12 bg-gray-800 rounded-t-full left-1/2 transform -translate-x-1/2"></div>
+                              <div className="absolute bottom-2 w-12 h-5 bg-gray-700 rounded-full left-1/2 transform -translate-x-1/2"></div>
+                              
+                              {/* Animated head movement */}
+                              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full bg-gray-600"
+                                   style={{
+                                     animation: 'float 3s ease-in-out infinite',
+                                     animationDirection: 'alternate'
+                                   }}>
+                                {/* Eyes */}
+                                <div className="flex justify-center space-x-2 pt-3">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
+                                  <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
+                                </div>
+                                {/* Headset */}
+                                <div className="absolute top-0 left-[-3px] w-2 h-4 bg-black rounded"></div>
+                                <div className="absolute top-0 right-[-3px] w-2 h-4 bg-black rounded"></div>
+                                <div className="absolute top-[-2px] left-[-1px] right-[-1px] h-1.5 bg-black rounded"></div>
+                              </div>
+                            </div>
+                            
+                            {/* Gaming chair */}
+                            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-4 bg-red-800 rounded-t-md"></div>
+                          </div>
+                        </div>
+                        
+                        {/* Webcam overlay gradient and info */}
                         <div className="w-full bg-gradient-to-t from-black/70 to-transparent px-2 py-1">
                           <div className="flex items-center">
-                            <div className="h-5 w-5 rounded-full bg-red-500 mr-1"></div>
+                            <div className="h-5 w-5 rounded-full bg-red-500 mr-1 animate-pulse-fast"></div>
                             <span className="text-xs text-white font-medium">LIVE</span>
                           </div>
                         </div>
                       </div>
+                      
+                      {/* Lighting effect overlays */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/5 to-transparent"></div>
+                      <div className="absolute inset-0 bg-gradient-to-bl from-red-500/5 to-transparent 
+                                     animate-pulse-fast" style={{ animationDuration: '5s' }}></div>
                     </div>
                   </div>
                   
