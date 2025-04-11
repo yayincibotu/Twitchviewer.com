@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, X, LogOut, User, Settings, LayoutDashboard, ChevronRight } from "lucide-react";
+import { Menu, X, LogOut, User, Settings, LayoutDashboard, ChevronRight, Sparkles, MessageCircle, Users } from "lucide-react";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -129,26 +129,30 @@ export default function Navbar() {
           </div>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex md:space-x-1 lg:space-x-2">
+          <nav className="hidden lg:flex lg:space-x-2 xl:space-x-4">
             <NavLink href="/" isActive={isActivePath("/") && !isActivePath("/auth") && !isActivePath("/dashboard") && !isActivePath("/admin")}>
               Home
             </NavLink>
             
-            <NavLink href="/#features">
-              Features
+            <NavLink href="/viewer-bot">
+              <Sparkles className="h-4 w-4 mr-1 inline-block" /> Viewer Bot
+            </NavLink>
+            
+            <NavLink href="/chat-bot">
+              <MessageCircle className="h-4 w-4 mr-1 inline-block" /> Chat Bot
+            </NavLink>
+            
+            <NavLink href="/follow-bot">
+              <Users className="h-4 w-4 mr-1 inline-block" /> Follow Bot
             </NavLink>
             
             <NavLink href="/pricing">
               Pricing
             </NavLink>
-            
-            <NavLink href="/#contact">
-              Contact
-            </NavLink>
           </nav>
           
           {/* Auth Buttons (Desktop) */}
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="hidden md:flex items-center space-x-3 ml-4">
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -200,7 +204,7 @@ export default function Navbar() {
           </div>
           
           {/* Mobile menu button */}
-          <div className="flex md:hidden">
+          <div className="flex lg:hidden">
             <button
               type="button"
               className="inline-flex items-center justify-center p-2 rounded-lg text-neutral-600 hover:text-primary hover:bg-primary/5 transition-colors duration-300"
@@ -219,7 +223,7 @@ export default function Navbar() {
       
       {/* Mobile menu */}
       <div 
-        className={`md:hidden overflow-hidden transition-all duration-300 ${
+        className={`lg:hidden overflow-hidden transition-all duration-300 ${
           isMenuOpen ? 'max-h-[500px] border-b border-neutral-200' : 'max-h-0'
         }`}
       >
@@ -228,16 +232,20 @@ export default function Navbar() {
             Home
           </MobileNavLink>
           
-          <MobileNavLink href="/#features">
-            Features
+          <MobileNavLink href="/viewer-bot">
+            <Sparkles className="h-4 w-4 mr-2" /> Viewer Bot
+          </MobileNavLink>
+          
+          <MobileNavLink href="/chat-bot">
+            <MessageCircle className="h-4 w-4 mr-2" /> Chat Bot
+          </MobileNavLink>
+          
+          <MobileNavLink href="/follow-bot">
+            <Users className="h-4 w-4 mr-2" /> Follow Bot
           </MobileNavLink>
           
           <MobileNavLink href="/pricing">
             Pricing
-          </MobileNavLink>
-          
-          <MobileNavLink href="/#contact">
-            Contact
           </MobileNavLink>
           
           {user ? (
