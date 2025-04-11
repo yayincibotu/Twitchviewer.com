@@ -142,13 +142,21 @@ export default function AuthPage() {
   
   async function onRegisterSubmit(values: z.infer<typeof registerSchema>) {
     try {
-      const recaptchaToken = await registerRecaptchaRef.current?.executeAsync();
-      if (recaptchaToken) {
-        registerMutation.mutate({
-          ...values,
-          recaptchaToken
+      const recaptchaToken = registerRecaptchaRef.current?.getValue();
+      
+      if (!recaptchaToken) {
+        toast({
+          title: "reCAPTCHA Required",
+          description: "Please complete the reCAPTCHA verification before submitting",
+          variant: "destructive",
         });
+        return;
       }
+      
+      registerMutation.mutate({
+        ...values,
+        recaptchaToken
+      });
     } catch (error) {
       console.error("reCAPTCHA execution failed", error);
     } finally {
@@ -158,13 +166,21 @@ export default function AuthPage() {
   
   async function onResetRequestSubmit(values: z.infer<typeof passwordResetRequestSchema>) {
     try {
-      const recaptchaToken = await resetRecaptchaRef.current?.executeAsync();
-      if (recaptchaToken) {
-        requestPasswordResetMutation.mutate({
-          ...values,
-          recaptchaToken
+      const recaptchaToken = resetRecaptchaRef.current?.getValue();
+      
+      if (!recaptchaToken) {
+        toast({
+          title: "reCAPTCHA Required",
+          description: "Please complete the reCAPTCHA verification before submitting",
+          variant: "destructive",
         });
+        return;
       }
+      
+      requestPasswordResetMutation.mutate({
+        ...values,
+        recaptchaToken
+      });
     } catch (error) {
       console.error("reCAPTCHA execution failed", error);
     } finally {
