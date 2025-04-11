@@ -62,21 +62,48 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Premium Logo */}
           <div className="flex-shrink-0">
             <Link href="/">
-              <div className="text-2xl font-bold bg-gradient-to-r from-primary to-violet-600 bg-clip-text text-transparent flex items-center">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center text-white mr-3 shadow-soft">
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    viewBox="0 0 24 24" 
-                    fill="currentColor" 
-                    className="w-6 h-6"
-                  >
-                    <path d="M4 3h16v12h-6l-4 4v-4H4V3zm12 4h-2v4h2V7zm-6 0h2v4h-2V7z"/>
-                  </svg>
+              <div className="font-bold flex items-center group">
+                {/* Animated logo mark */}
+                <div className="relative">
+                  {/* Base elements - interactive 3D-like layers */}
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-700 to-violet-800 flex items-center justify-center text-white shadow-elevated transform transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3">
+                    {/* Background pulse effect */}
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-600/50 to-violet-700/50 blur-sm group-hover:blur-md transform transition-all duration-300 group-hover:scale-110 animate-pulse-slow"></div>
+                    
+                    {/* Main Icon */}
+                    <div className="relative z-10 flex items-center justify-center w-full h-full">
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        viewBox="0 0 24 24" 
+                        fill="currentColor" 
+                        className="w-7 h-7 group-hover:scale-110 transform transition-all duration-300"
+                      >
+                        <path d="M4 3h16v12h-6l-4 4v-4H4V3zm12 4h-2v4h2V7zm-6 0h2v4h-2V7z"/>
+                      </svg>
+                      
+                      {/* Glowing dot - live status indicator */}
+                      <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-green-400 shadow-glow animate-pulse"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Subtle reflection effect */}
+                  <div className="absolute -bottom-1 left-1 right-1 h-2 rounded-xl bg-blue-700/20 filter blur-sm transform transition-all duration-300 group-hover:blur-md group-hover:bg-blue-700/30"></div>
                 </div>
-                <span className="hidden sm:inline">TwitchViewer</span>
+                
+                {/* Brand Text with gradient */}
+                <div className="relative ml-3 flex flex-col">
+                  <span className="text-xl md:text-2xl bg-gradient-to-r from-blue-700 via-violet-700 to-purple-700 bg-clip-text text-transparent font-heading tracking-tight leading-none hidden sm:inline">
+                    Twitch<span className="font-bold">Viewer</span>
+                  </span>
+                  
+                  {/* Animated tagline with slide-in text */}
+                  <span className="text-[10px] text-blue-700/70 font-medium uppercase tracking-wider mt-0.5 hidden sm:inline overflow-hidden group-hover:after:content-['Pro'] after:ml-px after:animate-typewriter">
+                    Viewer Boost
+                  </span>
+                </div>
               </div>
             </Link>
           </div>
