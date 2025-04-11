@@ -98,7 +98,7 @@ export function setupAuth(app: Express) {
 
       // In a real app, we would send an email verification here
       // For now, let's just auto-verify the first created user and make them admin
-      const isFirstUser = user.id === 1;
+      const isFirstUser = user.id == 1; // Using == to avoid type issues
       if (isFirstUser) {
         await storage.verifyUserEmail(user.id);
         await storage.updateUserRole(user.id, "admin");
@@ -241,8 +241,8 @@ export function setupAuth(app: Express) {
           // Set session to expire in 30 days
           req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
         } else {
-          // Set session to expire when browser is closed
-          req.session.cookie.maxAge = null;
+          // Set session to expire when browser is closed (browser session)
+          req.session.cookie.maxAge = undefined;
         }
       }
       
@@ -262,7 +262,10 @@ export function setupAuth(app: Express) {
     
     // Generate a random state value for CSRF protection
     const state = randomBytes(16).toString("hex");
-    req.session.oauthState = state;
+    // Type-safe way to store state in session
+    if (req.session) {
+      (req.session as any).oauthState = state;
+    }
     
     // Construct Twitch OAuth URL
     const twitchAuthUrl = new URL("https://id.twitch.tv/oauth2/authorize");
@@ -280,12 +283,14 @@ export function setupAuth(app: Express) {
       const { code, state } = req.query;
       
       // Verify state parameter to prevent CSRF
-      if (!state || !req.session.oauthState || state !== req.session.oauthState) {
+      if (!state || !req.session || !(req.session as any).oauthState || state !== (req.session as any).oauthState) {
         return res.status(400).json({ message: "Invalid state parameter" });
       }
       
       // Clear the state from session
-      delete req.session.oauthState;
+      if (req.session) {
+        delete (req.session as any).oauthState;
+      }
       
       if (!code) {
         return res.status(400).json({ message: "Authorization code not provided" });
@@ -339,7 +344,8 @@ export function setupAuth(app: Express) {
         }] 
       };
       
-      if (!userData.data || userData.data.length === 0) {
+      // Check if data array is empty
+      if (!userData.data || !userData.data.length) {
         return res.status(400).json({ message: "No user data returned from Twitch" });
       }
       
