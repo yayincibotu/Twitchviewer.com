@@ -99,11 +99,11 @@ export default function LimitedTimeOfferBanner() {
   const offeredPackage = packages?.find(pkg => pkg.id === offer.packageId);
 
   return (
-    <div className="bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 relative overflow-hidden">
+    <div className="bg-gradient-to-r from-purple-600 to-blue-500 text-white py-2 relative overflow-hidden">
       {/* Background effect */}
-      <div className="absolute inset-0 overflow-hidden h-12 top-1/2 -translate-y-1/2">
-        <div className="absolute -left-4 top-0 w-12 h-12 rounded-full bg-white opacity-10 animate-pulse"></div>
-        <div className="absolute right-10 top-0 w-8 h-8 rounded-full bg-white opacity-10 animate-pulse delay-300"></div>
+      <div className="absolute inset-0 overflow-hidden h-8 top-1/2 -translate-y-1/2">
+        <div className="absolute -left-4 top-0 w-8 h-8 rounded-full bg-white opacity-10 animate-pulse"></div>
+        <div className="absolute right-10 top-0 w-6 h-6 rounded-full bg-white opacity-10 animate-pulse delay-300"></div>
       </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -115,29 +115,20 @@ export default function LimitedTimeOfferBanner() {
           <X size={20} />
         </button>
         
-        <div className="flex flex-col md:flex-row items-center justify-between pr-12">
-          <div className="flex items-center mb-3 md:mb-0">
-            <Sparkles className="mr-2 h-5 w-5 text-yellow-300" />
-            <span className="font-bold text-lg">{offer.title}</span>
+        <div className="flex items-center justify-between pr-12 py-0.5">
+          <div className="flex items-center">
+            <Sparkles className="mr-2 h-4 w-4 text-yellow-300" />
+            <span className="font-bold text-sm">{offer.title}</span>
             {offer.couponCode && (
-              <span className="ml-2 bg-white bg-opacity-20 text-white px-2 py-1 rounded text-sm font-mono">
+              <span className="ml-2 bg-white bg-opacity-20 text-white px-1.5 py-0.5 rounded text-xs font-mono">
                 {offer.couponCode}
               </span>
             )}
           </div>
           
-          <div className="flex flex-col md:flex-row items-center gap-3 md:gap-6">
-            <div className="flex items-center">
-              <Clock className="mr-2 h-5 w-5 text-yellow-300" />
-              <span>Time left: <strong>{timeLeft}</strong></span>
-            </div>
-            
-            <Button 
-              onClick={() => setLocation("/pricing")}
-              className="bg-white text-purple-700 hover:bg-neutral-100 border-none"
-            >
-              Sign Up Now
-            </Button>
+          <div className="flex items-center">
+            <Clock className="mr-2 h-4 w-4 text-yellow-300" />
+            <span className="text-sm">Time left: <strong>{timeLeft}</strong></span>
           </div>
         </div>
       </div>
