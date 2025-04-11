@@ -99,18 +99,29 @@ export default function Navbar() {
                         <path d="M5.26 17.242a.75.75 0 1 0-.897-1.203 5.243 5.243 0 0 0-2.05 5.022.75.75 0 0 0 .625.627 5.243 5.243 0 0 0 5.022-2.051.75.75 0 1 0-1.202-.897 3.744 3.744 0 0 1-3.008 1.51c0-1.23.592-2.323 1.51-3.008Z" />
                       </svg>
                       
-                      {/* Animated rocket trails */}
-                      <div className="absolute bottom-1.5 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        {/* Main trail */}
-                        <div className="w-1.5 h-4 bg-gradient-to-t from-orange-500 via-orange-300 to-transparent rounded-full animate-pulse-fast"></div>
+                      {/* Enhanced rocket flame effect */}
+                      <div className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        {/* Rocket Engine Flare - central glow */}
+                        <div className="absolute bottom-[-4px] left-1/2 transform -translate-x-1/2 w-6 h-6 bg-orange-500/50 rounded-full blur-md animate-flare-pulse"></div>
                         
-                        {/* Side trails */}
-                        <div className="absolute -left-1 bottom-0 w-1 h-2 bg-gradient-to-t from-orange-500/70 to-transparent rounded-full animate-pulse-fast animation-delay-150"></div>
-                        <div className="absolute -right-1 bottom-0 w-1 h-2 bg-gradient-to-t from-orange-500/70 to-transparent rounded-full animate-pulse-fast animation-delay-300"></div>
+                        {/* Main flame cone */}
+                        <div className="absolute bottom-[-3px] left-1/2 transform -translate-x-1/2 w-2 h-6 bg-gradient-to-t from-orange-600 via-orange-500 to-yellow-300 rounded-b-lg animate-pulse-fast"></div>
                         
-                        {/* Particles */}
-                        <div className="absolute -left-0.5 bottom-1 w-0.5 h-0.5 bg-orange-300 rounded-full animate-ping"></div>
-                        <div className="absolute right-0 bottom-2 w-0.5 h-0.5 bg-orange-300 rounded-full animate-ping animation-delay-200"></div>
+                        {/* Wider flame base */}
+                        <div className="absolute bottom-[-6px] left-1/2 transform -translate-x-1/2 w-6 h-3 bg-gradient-to-t from-orange-600 via-orange-500 to-transparent rounded-full blur-sm animate-flare-pulse"></div>
+                        
+                        {/* Side flames */}
+                        <div className="absolute bottom-[-4px] left-[calc(50%-4px)] w-1.5 h-4 bg-gradient-to-t from-orange-600 via-orange-400 to-transparent rounded-full blur-[1px] rotate-[-15deg] animate-pulse-fast animation-delay-150"></div>
+                        <div className="absolute bottom-[-4px] right-[calc(50%-4px)] w-1.5 h-4 bg-gradient-to-t from-orange-600 via-orange-400 to-transparent rounded-full blur-[1px] rotate-[15deg] animate-pulse-fast animation-delay-300"></div>
+                        
+                        {/* Spark particles */}
+                        <div className="absolute bottom-[-2px] left-[calc(50%-5px)] w-1 h-1 bg-yellow-300 rounded-full blur-[0.5px] opacity-80 animate-spark"></div>
+                        <div className="absolute bottom-[-3px] right-[calc(50%-6px)] w-0.5 h-0.5 bg-yellow-200 rounded-full opacity-90 animate-spark animation-delay-200"></div>
+                        <div className="absolute bottom-[-4px] left-[calc(50%-2px)] w-0.5 h-0.5 bg-yellow-200 rounded-full opacity-90 animate-spark animation-delay-300"></div>
+                        <div className="absolute bottom-[-2px] right-[calc(50%-3px)] w-1 h-1 bg-yellow-300 rounded-full blur-[0.5px] opacity-80 animate-spark animation-delay-100"></div>
+                        
+                        {/* Heat distortion effect */}
+                        <div className="absolute bottom-[-8px] left-[calc(50%-6px)] w-12 h-6 bg-gradient-to-t from-orange-500/10 to-transparent rounded-full blur-md"></div>
                       </div>
                       
                       {/* Live status indicator */}
