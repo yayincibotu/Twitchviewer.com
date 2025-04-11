@@ -308,7 +308,13 @@ export default function AuthPage() {
                               sitekey="6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV"
                               size="normal"
                               theme="light"
+                              onChange={(token) => {
+                                console.log("reCAPTCHA token:", token);
+                              }}
                             />
+                            <div className="mt-2 text-sm text-red-600">
+                              If reCAPTCHA is not visible, please ensure you are not blocking scripts from Google
+                            </div>
                           </div>
                           
                           <Button 
@@ -424,7 +430,13 @@ export default function AuthPage() {
                               sitekey="6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV"
                               size="normal"
                               theme="light"
+                              onChange={(token) => {
+                                console.log("reCAPTCHA token:", token);
+                              }}
                             />
+                            <div className="mt-2 text-sm text-red-600">
+                              If reCAPTCHA is not visible, please ensure you are not blocking scripts from Google
+                            </div>
                           </div>
                           
                           <Button 
@@ -509,7 +521,13 @@ export default function AuthPage() {
                               sitekey="6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV"
                               size="normal"
                               theme="light"
+                              onChange={(token) => {
+                                console.log("reCAPTCHA token:", token);
+                              }}
                             />
+                            <div className="mt-2 text-sm text-red-600">
+                              If reCAPTCHA is not visible, please ensure you are not blocking scripts from Google
+                            </div>
                           </div>
                           
                           <Button 
