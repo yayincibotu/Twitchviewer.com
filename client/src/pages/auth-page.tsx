@@ -255,7 +255,23 @@ export default function AuthPage() {
                             </button>
                           </div>
                           
-
+                          <FormField
+                            control={loginForm.control}
+                            name="turnstileToken"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Security Verification</FormLabel>
+                                <FormControl>
+                                  <TurnstileWidget
+                                    onVerify={(token) => field.onChange(token)}
+                                    onExpire={() => field.onChange("")}
+                                    onError={() => field.onChange("")}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                           
                           <Button 
                             type="submit" 
