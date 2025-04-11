@@ -15,6 +15,8 @@ const NotFound = lazy(() => import("@/pages/not-found"));
 const AuthPage = lazy(() => import("@/pages/auth-page"));
 const DashboardPage = lazy(() => import("@/pages/dashboard-page"));
 const AdminDashboard = lazy(() => import("@/pages/admin-dashboard"));
+const AdminUsers = lazy(() => import("@/pages/admin/users"));
+const AdminPackages = lazy(() => import("@/pages/admin/packages"));
 const CheckoutPage = lazy(() => import("@/pages/checkout"));
 const PricingPage = lazy(() => import("@/pages/pricing-page"));
 const ViewerBotPage = lazy(() => import("@/pages/viewer-bot-page"));
@@ -47,6 +49,8 @@ function Router() {
         <Route path="/follow-bot" component={FollowBotPage} />
         <ProtectedRoute path="/dashboard" component={DashboardPage} />
         <ProtectedRoute path="/admin" component={AdminDashboard} requireAdmin />
+        <ProtectedRoute path="/admin/users" component={AdminUsers} requireAdmin />
+        <ProtectedRoute path="/admin/packages" component={AdminPackages} requireAdmin />
         <ProtectedRoute path="/checkout/:packageId" component={CheckoutPage} />
         <Route component={NotFound} />
       </Switch>
