@@ -17,6 +17,7 @@ const DashboardPage = lazy(() => import("@/pages/dashboard-page"));
 const AdminDashboard = lazy(() => import("@/pages/admin-dashboard"));
 const AdminUsers = lazy(() => import("@/pages/admin/users"));
 const AdminPackages = lazy(() => import("@/pages/admin/packages"));
+const AdminBlog = lazy(() => import("@/pages/admin/blog"));
 const CheckoutPage = lazy(() => import("@/pages/checkout"));
 const PricingPage = lazy(() => import("@/pages/pricing-page"));
 const ViewerBotPage = lazy(() => import("@/pages/viewer-bot-page"));
@@ -51,6 +52,7 @@ function Router() {
         <ProtectedRoute path="/admin" component={AdminDashboard} requireAdmin />
         <ProtectedRoute path="/admin/users" component={AdminUsers} requireAdmin />
         <ProtectedRoute path="/admin/packages" component={AdminPackages} requireAdmin />
+        <ProtectedRoute path="/admin/blog" component={AdminBlog} requireAdmin />
         <ProtectedRoute path="/checkout/:packageId" component={CheckoutPage} />
         <Route component={NotFound} />
       </Switch>

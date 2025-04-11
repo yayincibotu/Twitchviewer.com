@@ -12,7 +12,10 @@ import {
   Star,
   FileText,
   ShieldCheck,
-  Clock
+  Clock,
+  BookOpen,
+  Pencil,
+  FileEdit
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -141,6 +144,27 @@ export default function AdminSidebar() {
             isActive={location === "/admin/packages/new"}
           >
             Create Package
+          </NavItem>
+        </NavGroup>
+        
+        <NavGroup 
+          title="Blog" 
+          icon={<BookOpen className="h-5 w-5" />}
+          defaultOpen={location.startsWith("/admin/blog")}
+        >
+          <NavItem 
+            href="/admin/blog" 
+            icon={<BookOpen className="h-4 w-4" />} 
+            isActive={location === "/admin/blog"}
+          >
+            All Posts
+          </NavItem>
+          <NavItem 
+            href="/admin/blog/new" 
+            icon={<FileEdit className="h-4 w-4" />} 
+            isActive={location === "/admin/blog/new"}
+          >
+            Create Post
           </NavItem>
         </NavGroup>
         
