@@ -8,6 +8,11 @@ interface TurnstileProps {
   className?: string;
 }
 
+// Debugging için site anahtarını logluyoruz
+console.log("Turnstile ENV Variables:", {
+  "VITE_TURNSTILE_SITE_KEY": import.meta.env.VITE_TURNSTILE_SITE_KEY,
+  "All ENV": import.meta.env
+});
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
 export const TurnstileWidget = forwardRef<HTMLDivElement, TurnstileProps>(
@@ -43,7 +48,7 @@ export const TurnstileWidget = forwardRef<HTMLDivElement, TurnstileProps>(
     }
 
     return (
-      <div ref={ref} className={className} {...props}>
+      <div ref={ref} className={`${className || ''}`} {...props}>
         <Turnstile
           key={key}
           turnstileSiteKey={TURNSTILE_SITE_KEY}
@@ -51,7 +56,6 @@ export const TurnstileWidget = forwardRef<HTMLDivElement, TurnstileProps>(
           expiredCallback={onExpire || reset}
           errorCallback={onError}
           theme="auto"
-          className="mt-2"
         />
       </div>
     );
