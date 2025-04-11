@@ -106,7 +106,7 @@ export default function LimitedTimeOfferBanner() {
         <div className="absolute right-10 bottom-0 w-16 h-16 rounded-full bg-white opacity-10 animate-pulse delay-300"></div>
       </div>
       
-      <div className="container mx-auto px-4 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <button 
           onClick={dismissBanner}
           className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-neutral-200"
