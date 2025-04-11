@@ -204,6 +204,250 @@ export class MemStorage implements IStorage {
     ];
     
     defaultSeoSettings.forEach(settings => this.createSeoSettings(settings));
+    
+    // Initialize with default statistics
+    const defaultStatistics: InsertStatistic[] = [
+      {
+        name: "Active Viewers",
+        value: 15462,
+        icon: "users",
+        description: "Currently online viewers across all platforms",
+        isActive: true,
+        order: 1
+      },
+      {
+        name: "Successful Streams",
+        value: 27849,
+        icon: "video",
+        description: "Streams successfully boosted last month",
+        isActive: true,
+        order: 2
+      },
+      {
+        name: "Average Growth",
+        value: 284,
+        icon: "trending-up",
+        description: "Average viewer increase per stream",
+        isActive: true,
+        order: 3
+      },
+      {
+        name: "Client Satisfaction",
+        value: 98,
+        icon: "heart",
+        description: "Percentage of satisfied customers",
+        isActive: true,
+        order: 4
+      }
+    ];
+    
+    defaultStatistics.forEach(stat => this.createStatistic(stat));
+    
+    // Initialize with default success stories
+    const defaultSuccessStories: InsertSuccessStory[] = [
+      {
+        streamerName: "GameMasterX",
+        streamerAvatar: "https://i.pravatar.cc/150?img=1",
+        platformType: "twitch",
+        beforeCount: 45,
+        afterCount: 312,
+        growthPercent: 593,
+        testimonial: "TwitchViewer completely changed my streaming career! I went from having just a few viewers to hundreds in just two weeks!",
+        isVerified: true,
+        isVisible: true,
+        order: 1
+      },
+      {
+        streamerName: "EpicStreamQueen",
+        streamerAvatar: "https://i.pravatar.cc/150?img=5",
+        platformType: "twitch",
+        beforeCount: 27,
+        afterCount: 189,
+        growthPercent: 600,
+        testimonial: "I was about to quit streaming until I found TwitchViewer. Now I'm partnered and making a living from my streams!",
+        isVerified: true,
+        isVisible: true,
+        order: 2
+      },
+      {
+        streamerName: "ProGamerLife",
+        streamerAvatar: "https://i.pravatar.cc/150?img=3",
+        platformType: "youtube",
+        beforeCount: 68,
+        afterCount: 437,
+        growthPercent: 542,
+        testimonial: "The most reliable viewer service I've ever used. Consistent results and excellent support team!",
+        isVerified: true,
+        isVisible: true,
+        order: 3
+      }
+    ];
+    
+    defaultSuccessStories.forEach(story => this.createSuccessStory(story));
+    
+    // Initialize with default FAQ categories and items
+    const generalCategory = this.createFaqCategory({
+      name: "General Questions",
+      slug: "general",
+      order: 1
+    });
+    
+    const technicalCategory = this.createFaqCategory({
+      name: "Technical Information",
+      slug: "technical",
+      order: 2
+    });
+    
+    const billingCategory = this.createFaqCategory({
+      name: "Billing & Payments",
+      slug: "billing",
+      order: 3
+    });
+    
+    const defaultFaqItems: InsertFaqItem[] = [
+      {
+        categoryId: generalCategory.id,
+        question: "What is TwitchViewer.com?",
+        answer: "TwitchViewer.com is a professional service that helps Twitch streamers grow their audience by boosting viewer counts, which improves channel visibility and ranking in Twitch's recommendation algorithm.",
+        isSchemaFaq: true,
+        order: 1
+      },
+      {
+        categoryId: generalCategory.id,
+        question: "Is using TwitchViewer against Twitch's Terms of Service?",
+        answer: "Our service provides genuine viewer traffic to help you grow naturally. We focus on boosting your initial viewership to help you become more discoverable to genuine viewers who will enjoy your content.",
+        isSchemaFaq: true,
+        order: 2
+      },
+      {
+        categoryId: technicalCategory.id,
+        question: "How do I set up TwitchViewer for my channel?",
+        answer: "Setting up is simple! Just create an account, choose your package, and enter your channel name. Our system will automatically start generating viewers for your streams within minutes.",
+        isSchemaFaq: true,
+        order: 1
+      },
+      {
+        categoryId: technicalCategory.id,
+        question: "Will the viewers interact with my channel?",
+        answer: "Our service focuses on providing viewer count. While our viewers don't typically chat, the increased viewer count will attract real users who will engage with your content.",
+        isSchemaFaq: true,
+        order: 2
+      },
+      {
+        categoryId: billingCategory.id,
+        question: "Are there any long-term contracts?",
+        answer: "No, all our packages are subscription-based with monthly billing. You can cancel anytime without penalties or hidden fees.",
+        isSchemaFaq: true,
+        order: 1
+      },
+      {
+        categoryId: billingCategory.id,
+        question: "What payment methods do you accept?",
+        answer: "We accept all major credit cards, PayPal, and cryptocurrency payments including Bitcoin and Ethereum for maximum privacy and convenience.",
+        isSchemaFaq: true,
+        order: 2
+      }
+    ];
+    
+    defaultFaqItems.forEach(item => this.createFaqItem(item));
+    
+    // Initialize with default security badges
+    const defaultSecurityBadges: InsertSecurityBadge[] = [
+      {
+        name: "256-bit SSL Encryption",
+        icon: "lock",
+        description: "All data is securely transmitted with 256-bit SSL encryption",
+        isActive: true,
+        order: 1
+      },
+      {
+        name: "PCI DSS Compliant",
+        icon: "credit-card",
+        description: "Payment processing meets PCI DSS Level 1 requirements",
+        isActive: true,
+        order: 2
+      },
+      {
+        name: "GDPR Compliant",
+        icon: "shield",
+        description: "Your data is handled in compliance with GDPR regulations",
+        isActive: true,
+        order: 3
+      },
+      {
+        name: "24/7 Fraud Monitoring",
+        icon: "eye",
+        description: "Continuous monitoring for suspicious activities",
+        isActive: true,
+        order: 4
+      }
+    ];
+    
+    defaultSecurityBadges.forEach(badge => this.createSecurityBadge(badge));
+    
+    // Create a default limited time offer
+    const now = new Date();
+    const oneWeekLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    const defaultLimitedTimeOffer: InsertLimitedTimeOffer = {
+      title: "Launch Special: 30% Off Professional Plan",
+      description: "Get our Professional plan with 30% discount for your first 3 months. Limited time offer!",
+      discountPercent: 30,
+      packageId: 2, // Professional package 
+      startDate: now,
+      endDate: oneWeekLater,
+      couponCode: "LAUNCH30",
+      isActive: true
+    };
+    
+    this.createLimitedTimeOffer(defaultLimitedTimeOffer);
+    
+    // Create a default blog post
+    const defaultBlogPost: InsertBlogPost = {
+      title: "5 Proven Strategies to Grow Your Twitch Audience",
+      slug: "5-proven-strategies-grow-twitch-audience",
+      excerpt: "Learn the top strategies that successful Twitch streamers use to grow their audiences and build engaged communities.",
+      content: `
+# 5 Proven Strategies to Grow Your Twitch Audience
+
+Growing your audience on Twitch requires a combination of consistency, quality content, and smart promotion. Here are five proven strategies that can help you increase your viewership and build an engaged community.
+
+## 1. Stream Consistently
+
+One of the most important factors in growing your Twitch channel is consistency. Create a regular streaming schedule and stick to it. When viewers know when to expect your streams, they're more likely to come back regularly.
+
+## 2. Optimize Your Stream Quality
+
+Invest in good equipment to ensure your streams look and sound professional. This includes:
+- A decent microphone
+- Proper lighting
+- Stable internet connection
+- Optimized encoding settings
+
+## 3. Engage With Your Audience
+
+Interact with your viewers through chat. Acknowledge new followers and subscribers. Create a welcoming environment where viewers feel appreciated and part of the community.
+
+## 4. Network With Other Streamers
+
+Collaborate with other streamers of similar size to cross-promote each other's channels. Participate in gaming communities and forums to increase your visibility.
+
+## 5. Leverage Social Media
+
+Promote your streams on social media platforms. Share highlights, announce upcoming streams, and engage with your audience outside of Twitch.
+
+By implementing these strategies consistently, you'll be well on your way to growing a thriving Twitch community!
+      `,
+      featuredImage: "https://images.unsplash.com/photo-1603481588273-2f908a9a7a1b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80",
+      authorId: null,
+      tags: ["growth", "twitch", "streaming", "audience"],
+      publishDate: new Date(),
+      metaTitle: "5 Proven Strategies to Grow Your Twitch Audience | TwitchViewer.com",
+      metaDescription: "Discover five proven strategies that successful streamers use to grow their Twitch audience and build engaged communities.",
+      isPublished: true
+    };
+    
+    this.createBlogPost(defaultBlogPost);
   }
 
   // User operations

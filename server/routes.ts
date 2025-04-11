@@ -271,6 +271,393 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Error updating SEO settings: " + error.message });
     }
   });
+  
+  // ----- Statistics Routes (Live Counter) -----
+  
+  app.get("/api/statistics", cacheMiddleware(60000), async (req, res) => {
+    try {
+      const statistics = await storage.getActiveStatistics();
+      res.json(statistics);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching statistics: " + error.message });
+    }
+  });
+  
+  app.post("/api/statistics", checkIsAdmin, async (req, res) => {
+    try {
+      const statistic = await storage.createStatistic(req.body);
+      clearCache('/api/statistics');
+      res.status(201).json(statistic);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error creating statistic: " + error.message });
+    }
+  });
+  
+  app.patch("/api/statistics/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const statId = parseInt(req.params.id);
+      const updatedStat = await storage.updateStatistic(statId, req.body);
+      
+      if (!updatedStat) {
+        return res.status(404).json({ message: "Statistic not found" });
+      }
+      
+      clearCache('/api/statistics');
+      res.json(updatedStat);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error updating statistic: " + error.message });
+    }
+  });
+  
+  app.delete("/api/statistics/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const deleted = await storage.deleteStatistic(parseInt(req.params.id));
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Statistic not found" });
+      }
+      
+      clearCache('/api/statistics');
+      res.status(204).end();
+    } catch (error: any) {
+      res.status(500).json({ message: "Error deleting statistic: " + error.message });
+    }
+  });
+  
+  // ----- Success Stories Routes -----
+  
+  app.get("/api/success-stories", cacheMiddleware(3600000), async (req, res) => {
+    try {
+      const stories = await storage.getVisibleSuccessStories();
+      res.json(stories);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching success stories: " + error.message });
+    }
+  });
+  
+  app.post("/api/success-stories", checkIsAdmin, async (req, res) => {
+    try {
+      const story = await storage.createSuccessStory(req.body);
+      clearCache('/api/success-stories');
+      res.status(201).json(story);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error creating success story: " + error.message });
+    }
+  });
+  
+  app.patch("/api/success-stories/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const storyId = parseInt(req.params.id);
+      const story = await storage.updateSuccessStory(storyId, req.body);
+      
+      if (!story) {
+        return res.status(404).json({ message: "Success story not found" });
+      }
+      
+      clearCache('/api/success-stories');
+      res.json(story);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error updating success story: " + error.message });
+    }
+  });
+  
+  app.delete("/api/success-stories/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const deleted = await storage.deleteSuccessStory(parseInt(req.params.id));
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Success story not found" });
+      }
+      
+      clearCache('/api/success-stories');
+      res.status(204).end();
+    } catch (error: any) {
+      res.status(500).json({ message: "Error deleting success story: " + error.message });
+    }
+  });
+  
+  // ----- FAQ Routes -----
+  
+  app.get("/api/faq/categories", cacheMiddleware(3600000), async (req, res) => {
+    try {
+      const categories = await storage.getFaqCategories();
+      res.json(categories);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching FAQ categories: " + error.message });
+    }
+  });
+  
+  app.get("/api/faq/items", cacheMiddleware(3600000), async (req, res) => {
+    try {
+      if (req.query.categoryId) {
+        const categoryId = parseInt(req.query.categoryId as string);
+        const items = await storage.getFaqItemsByCategory(categoryId);
+        return res.json(items);
+      }
+      
+      const items = await storage.getFaqItems();
+      res.json(items);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching FAQ items: " + error.message });
+    }
+  });
+  
+  app.post("/api/faq/categories", checkIsAdmin, async (req, res) => {
+    try {
+      const category = await storage.createFaqCategory(req.body);
+      clearCache('/api/faq/categories');
+      res.status(201).json(category);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error creating FAQ category: " + error.message });
+    }
+  });
+  
+  app.post("/api/faq/items", checkIsAdmin, async (req, res) => {
+    try {
+      const item = await storage.createFaqItem(req.body);
+      clearCache('/api/faq/items');
+      res.status(201).json(item);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error creating FAQ item: " + error.message });
+    }
+  });
+  
+  app.patch("/api/faq/categories/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const categoryId = parseInt(req.params.id);
+      const category = await storage.updateFaqCategory(categoryId, req.body);
+      
+      if (!category) {
+        return res.status(404).json({ message: "FAQ category not found" });
+      }
+      
+      clearCache('/api/faq/categories');
+      res.json(category);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error updating FAQ category: " + error.message });
+    }
+  });
+  
+  app.patch("/api/faq/items/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const itemId = parseInt(req.params.id);
+      const item = await storage.updateFaqItem(itemId, req.body);
+      
+      if (!item) {
+        return res.status(404).json({ message: "FAQ item not found" });
+      }
+      
+      clearCache('/api/faq/items');
+      res.json(item);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error updating FAQ item: " + error.message });
+    }
+  });
+  
+  app.delete("/api/faq/categories/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const deleted = await storage.deleteFaqCategory(parseInt(req.params.id));
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "FAQ category not found" });
+      }
+      
+      clearCache('/api/faq/categories');
+      clearCache('/api/faq/items'); // Items also need to be cleared because related items are deleted
+      res.status(204).end();
+    } catch (error: any) {
+      res.status(500).json({ message: "Error deleting FAQ category: " + error.message });
+    }
+  });
+  
+  app.delete("/api/faq/items/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const deleted = await storage.deleteFaqItem(parseInt(req.params.id));
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "FAQ item not found" });
+      }
+      
+      clearCache('/api/faq/items');
+      res.status(204).end();
+    } catch (error: any) {
+      res.status(500).json({ message: "Error deleting FAQ item: " + error.message });
+    }
+  });
+  
+  // ----- Blog Routes -----
+  
+  app.get("/api/blog/posts", cacheMiddleware(1800000), async (req, res) => {
+    try {
+      const posts = await storage.getPublishedBlogPosts();
+      res.json(posts);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching blog posts: " + error.message });
+    }
+  });
+  
+  app.get("/api/blog/posts/:slug", cacheMiddleware(1800000), async (req, res) => {
+    try {
+      const post = await storage.getBlogPostBySlug(req.params.slug);
+      
+      if (!post) {
+        return res.status(404).json({ message: "Blog post not found" });
+      }
+      
+      res.json(post);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching blog post: " + error.message });
+    }
+  });
+  
+  app.post("/api/blog/posts", checkIsAdmin, async (req, res) => {
+    try {
+      const post = await storage.createBlogPost(req.body);
+      clearCache('/api/blog/posts');
+      res.status(201).json(post);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error creating blog post: " + error.message });
+    }
+  });
+  
+  app.patch("/api/blog/posts/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      const post = await storage.updateBlogPost(postId, req.body);
+      
+      if (!post) {
+        return res.status(404).json({ message: "Blog post not found" });
+      }
+      
+      clearCache('/api/blog/posts');
+      clearCache(`/api/blog/posts/${post.slug}`);
+      res.json(post);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error updating blog post: " + error.message });
+    }
+  });
+  
+  app.delete("/api/blog/posts/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const post = await storage.getBlogPost(parseInt(req.params.id));
+      
+      if (!post) {
+        return res.status(404).json({ message: "Blog post not found" });
+      }
+      
+      const deleted = await storage.deleteBlogPost(post.id);
+      
+      clearCache('/api/blog/posts');
+      clearCache(`/api/blog/posts/${post.slug}`);
+      res.status(204).end();
+    } catch (error: any) {
+      res.status(500).json({ message: "Error deleting blog post: " + error.message });
+    }
+  });
+  
+  // ----- Security Badges Routes -----
+  
+  app.get("/api/security-badges", cacheMiddleware(86400000), async (req, res) => {
+    try {
+      const badges = await storage.getActiveSecurityBadges();
+      res.json(badges);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching security badges: " + error.message });
+    }
+  });
+  
+  app.post("/api/security-badges", checkIsAdmin, async (req, res) => {
+    try {
+      const badge = await storage.createSecurityBadge(req.body);
+      clearCache('/api/security-badges');
+      res.status(201).json(badge);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error creating security badge: " + error.message });
+    }
+  });
+  
+  app.patch("/api/security-badges/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const badgeId = parseInt(req.params.id);
+      const badge = await storage.updateSecurityBadge(badgeId, req.body);
+      
+      if (!badge) {
+        return res.status(404).json({ message: "Security badge not found" });
+      }
+      
+      clearCache('/api/security-badges');
+      res.json(badge);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error updating security badge: " + error.message });
+    }
+  });
+  
+  app.delete("/api/security-badges/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const deleted = await storage.deleteSecurityBadge(parseInt(req.params.id));
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Security badge not found" });
+      }
+      
+      clearCache('/api/security-badges');
+      res.status(204).end();
+    } catch (error: any) {
+      res.status(500).json({ message: "Error deleting security badge: " + error.message });
+    }
+  });
+  
+  // ----- Limited Time Offers Routes -----
+  
+  app.get("/api/limited-time-offers", cacheMiddleware(60000), async (req, res) => {
+    try {
+      const offers = await storage.getActiveLimitedTimeOffers();
+      res.json(offers);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching limited time offers: " + error.message });
+    }
+  });
+  
+  app.post("/api/limited-time-offers", checkIsAdmin, async (req, res) => {
+    try {
+      const offer = await storage.createLimitedTimeOffer(req.body);
+      clearCache('/api/limited-time-offers');
+      res.status(201).json(offer);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error creating limited time offer: " + error.message });
+    }
+  });
+  
+  app.patch("/api/limited-time-offers/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const offerId = parseInt(req.params.id);
+      const offer = await storage.updateLimitedTimeOffer(offerId, req.body);
+      
+      if (!offer) {
+        return res.status(404).json({ message: "Limited time offer not found" });
+      }
+      
+      clearCache('/api/limited-time-offers');
+      res.json(offer);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error updating limited time offer: " + error.message });
+    }
+  });
+  
+  app.delete("/api/limited-time-offers/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const deleted = await storage.deleteLimitedTimeOffer(parseInt(req.params.id));
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Limited time offer not found" });
+      }
+      
+      clearCache('/api/limited-time-offers');
+      res.status(204).end();
+    } catch (error: any) {
+      res.status(500).json({ message: "Error deleting limited time offer: " + error.message });
+    }
+  });
 
   // ----- Stripe Integration -----
   
