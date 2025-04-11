@@ -34,7 +34,7 @@ const loginSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   remember: z.boolean().optional(),
-  turnstileToken: z.string().min(1, "Please complete the Turnstile verification"),
+  turnstileToken: z.string().optional(),
 });
 
 export default function AuthPage() {
@@ -262,34 +262,7 @@ export default function AuthPage() {
                             </button>
                           </div>
                           
-                          <FormField
-                            control={loginForm.control}
-                            name="turnstileToken"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Security Verification</FormLabel>
-                                <FormControl>
-                                  <div>
-                                    <BasicTurnstile
-                                      onVerify={(token: string) => {
-                                        console.log("Turnstile login verification success, token length:", token?.length || 0);
-                                        field.onChange(token);
-                                      }}
-                                      onExpire={() => {
-                                        console.log("Turnstile login token expired");
-                                        field.onChange("");
-                                      }}
-                                      onError={(error: string) => {
-                                        console.error("Turnstile login error:", error);
-                                        field.onChange("");
-                                      }}
-                                    />
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+{/* Turnstile devre dışı bırakıldı */}
                           
                           <Button 
                             type="submit" 
