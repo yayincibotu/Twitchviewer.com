@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth, registerSchema, passwordResetRequestSchema, resetPasswordSchema } from "@/hooks/use-auth";
 import { Loader2, ArrowLeft, Check, LucideRocket } from "lucide-react";
-import ReCAPTCHA from "react-google-recaptcha";
+
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import { Separator } from "@/components/ui/separator";
@@ -20,19 +20,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { SiTwitch } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
 
-// reCAPTCHA window extension
-declare global {
-  interface Window { 
-    grecaptcha: any;
-    onloadCallback: () => void;
-  }
-}
+
 
 const loginSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   remember: z.boolean().optional(),
-  recaptchaToken: z.string().optional(),
 });
 
 export default function AuthPage() {
@@ -50,13 +43,7 @@ export default function AuthPage() {
     updateRememberSessionMutation 
   } = useAuth();
   
-  // Refs for reCAPTCHA
-  const loginRecaptchaRef = useRef<ReCAPTCHA>(null);
-  const registerRecaptchaRef = useRef<ReCAPTCHA>(null);
-  const resetRecaptchaRef = useRef<ReCAPTCHA>(null);
-  
-  // reCAPTCHA setup for the browser environment
-  const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV';
+
   
   // Redirect if already logged in
   useEffect(() => {
@@ -94,7 +81,6 @@ export default function AuthPage() {
       email: "",
       password: "",
       confirmPassword: "",
-      recaptchaToken: "",
     },
   });
   
