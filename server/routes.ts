@@ -7,6 +7,7 @@ import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
 import { registerViewerBotRoutes } from "./handlers/viewerbot";
 import { registerChatBotRoutes } from "./handlers/chatbot";
+import { registerFollowBotRoutes } from "./handlers/followbot";
 
 // Önbelleğe alma için basit bir mekanizma
 interface CacheEntry {
@@ -792,6 +793,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register chat bot routes
   registerChatBotRoutes(app);
+  
+  // Register follow bot routes
+  registerFollowBotRoutes(app);
 
   // Geliştirme ortamında HTTP, prodüksiyonda HTTP/2 kullan
   let httpServer: Server;
