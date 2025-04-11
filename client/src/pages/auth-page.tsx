@@ -302,18 +302,20 @@ export default function AuthPage() {
                             </button>
                           </div>
                           
-                          <div className="mt-4 flex justify-center">
-                            <ReCAPTCHA 
-                              ref={loginRecaptchaRef}
-                              sitekey="6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV"
-                              size="normal"
-                              theme="light"
-                              onChange={(token) => {
-                                console.log("reCAPTCHA token:", token);
-                              }}
-                            />
-                            <div className="mt-2 text-sm text-red-600">
-                              If reCAPTCHA is not visible, please ensure you are not blocking scripts from Google
+                          <div className="mt-4 flex flex-col items-center">
+                            <div className="recaptcha-container mb-2">
+                              <ReCAPTCHA 
+                                ref={loginRecaptchaRef}
+                                sitekey="6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV"
+                                size="normal"
+                                theme="light"
+                                onChange={(token) => {
+                                  console.log("reCAPTCHA token:", token);
+                                }}
+                              />
+                            </div>
+                            <div className="text-xs text-amber-600 italic">
+                              Please verify you're not a robot by completing the reCAPTCHA
                             </div>
                           </div>
                           
@@ -424,18 +426,20 @@ export default function AuthPage() {
                             )}
                           />
                           
-                          <div className="mt-4 flex justify-center">
-                            <ReCAPTCHA 
-                              ref={registerRecaptchaRef}
-                              sitekey="6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV"
-                              size="normal"
-                              theme="light"
-                              onChange={(token) => {
-                                console.log("reCAPTCHA token:", token);
-                              }}
-                            />
-                            <div className="mt-2 text-sm text-red-600">
-                              If reCAPTCHA is not visible, please ensure you are not blocking scripts from Google
+                          <div className="mt-4 flex flex-col items-center">
+                            <div className="recaptcha-container mb-2">
+                              <ReCAPTCHA 
+                                ref={registerRecaptchaRef}
+                                sitekey="6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV"
+                                size="normal"
+                                theme="light"
+                                onChange={(token) => {
+                                  console.log("reCAPTCHA token:", token);
+                                }}
+                              />
+                            </div>
+                            <div className="text-xs text-amber-600 italic">
+                              Please verify you're not a robot by completing the reCAPTCHA
                             </div>
                           </div>
                           
@@ -515,18 +519,20 @@ export default function AuthPage() {
                             )}
                           />
                           
-                          <div className="mt-4 flex justify-center">
-                            <ReCAPTCHA 
-                              ref={resetRecaptchaRef}
-                              sitekey="6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV"
-                              size="normal"
-                              theme="light"
-                              onChange={(token) => {
-                                console.log("reCAPTCHA token:", token);
-                              }}
-                            />
-                            <div className="mt-2 text-sm text-red-600">
-                              If reCAPTCHA is not visible, please ensure you are not blocking scripts from Google
+                          <div className="mt-4 flex flex-col items-center">
+                            <div className="recaptcha-container mb-2">
+                              <ReCAPTCHA 
+                                ref={resetRecaptchaRef}
+                                sitekey="6LdBxBQrAAAAAFTBtdeH-OQOuHPwx6sGnpOlKQIV"
+                                size="normal"
+                                theme="light"
+                                onChange={(token) => {
+                                  console.log("reCAPTCHA token:", token);
+                                }}
+                              />
+                            </div>
+                            <div className="text-xs text-amber-600 italic">
+                              Please verify you're not a robot by completing the reCAPTCHA
                             </div>
                           </div>
                           
