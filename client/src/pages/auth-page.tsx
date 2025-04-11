@@ -89,7 +89,6 @@ export default function AuthPage() {
     resolver: zodResolver(passwordResetRequestSchema),
     defaultValues: {
       email: "",
-      recaptchaToken: "",
     },
   });
   
@@ -109,79 +108,31 @@ export default function AuthPage() {
   }, [resetToken, resetPasswordForm]);
   
   async function onLoginSubmit(values: z.infer<typeof loginSchema>) {
-    try {
-      const recaptchaToken = loginRecaptchaRef.current?.getValue();
-      
-      if (!recaptchaToken) {
-        toast({
-          title: "reCAPTCHA Required",
-          description: "Please complete the reCAPTCHA verification before submitting",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      loginMutation.mutate({
-        ...values,
-        recaptchaToken
-      });
+    try {      
+      loginMutation.mutate(values);
       
       // If remember me is checked, update the session
       if (values.remember) {
         updateRememberSessionMutation.mutate({ remember: true });
       }
     } catch (error) {
-      console.error("reCAPTCHA execution failed", error);
-    } finally {
-      loginRecaptchaRef.current?.reset();
+      console.error("Login submission failed", error);
     }
   }
   
   async function onRegisterSubmit(values: z.infer<typeof registerSchema>) {
     try {
-      const recaptchaToken = registerRecaptchaRef.current?.getValue();
-      
-      if (!recaptchaToken) {
-        toast({
-          title: "reCAPTCHA Required",
-          description: "Please complete the reCAPTCHA verification before submitting",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      registerMutation.mutate({
-        ...values,
-        recaptchaToken
-      });
+      registerMutation.mutate(values);
     } catch (error) {
-      console.error("reCAPTCHA execution failed", error);
-    } finally {
-      registerRecaptchaRef.current?.reset();
+      console.error("Registration submission failed", error);
     }
   }
   
   async function onResetRequestSubmit(values: z.infer<typeof passwordResetRequestSchema>) {
     try {
-      const recaptchaToken = resetRecaptchaRef.current?.getValue();
-      
-      if (!recaptchaToken) {
-        toast({
-          title: "reCAPTCHA Required",
-          description: "Please complete the reCAPTCHA verification before submitting",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      requestPasswordResetMutation.mutate({
-        ...values,
-        recaptchaToken
-      });
+      requestPasswordResetMutation.mutate(values);
     } catch (error) {
-      console.error("reCAPTCHA execution failed", error);
-    } finally {
-      resetRecaptchaRef.current?.reset();
+      console.error("Password reset request failed", error);
     }
   }
   
@@ -299,22 +250,7 @@ export default function AuthPage() {
                             </button>
                           </div>
                           
-                          <div className="mt-4 flex flex-col items-center">
-                            <div className="recaptcha-container mb-2">
-                              <ReCAPTCHA 
-                                ref={loginRecaptchaRef}
-                                sitekey={RECAPTCHA_SITE_KEY}
-                                size="normal"
-                                theme="light"
-                                onChange={(token) => {
-                                  console.log("reCAPTCHA token:", token);
-                                }}
-                              />
-                            </div>
-                            <div className="text-xs text-amber-600 italic">
-                              Please verify you're not a robot by completing the reCAPTCHA
-                            </div>
-                          </div>
+
                           
                           <Button 
                             type="submit" 
@@ -423,22 +359,7 @@ export default function AuthPage() {
                             )}
                           />
                           
-                          <div className="mt-4 flex flex-col items-center">
-                            <div className="recaptcha-container mb-2">
-                              <ReCAPTCHA 
-                                ref={registerRecaptchaRef}
-                                sitekey={RECAPTCHA_SITE_KEY}
-                                size="normal"
-                                theme="light"
-                                onChange={(token) => {
-                                  console.log("reCAPTCHA token:", token);
-                                }}
-                              />
-                            </div>
-                            <div className="text-xs text-amber-600 italic">
-                              Please verify you're not a robot by completing the reCAPTCHA
-                            </div>
-                          </div>
+
                           
                           <Button 
                             type="submit" 
@@ -516,22 +437,7 @@ export default function AuthPage() {
                             )}
                           />
                           
-                          <div className="mt-4 flex flex-col items-center">
-                            <div className="recaptcha-container mb-2">
-                              <ReCAPTCHA 
-                                ref={resetRecaptchaRef}
-                                sitekey={RECAPTCHA_SITE_KEY}
-                                size="normal"
-                                theme="light"
-                                onChange={(token) => {
-                                  console.log("reCAPTCHA token:", token);
-                                }}
-                              />
-                            </div>
-                            <div className="text-xs text-amber-600 italic">
-                              Please verify you're not a robot by completing the reCAPTCHA
-                            </div>
-                          </div>
+
                           
                           <Button 
                             type="submit" 
