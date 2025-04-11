@@ -32,25 +32,7 @@ async function comparePasswords(supplied: string, stored: string) {
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
-// reCAPTCHA doğrulama fonksiyonu
-async function verifyRecaptcha(token: string): Promise<boolean> {
-  try {
-    const secretKey = process.env.RECAPTCHA_SECRET_KEY;
-    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: `secret=${secretKey}&response=${token}`,
-    });
-    
-    const data = await response.json() as { success: boolean };
-    return data.success;
-  } catch (error) {
-    console.error('reCAPTCHA verification error:', error);
-    return false;
-  }
-}
+
 
 // Şifre sıfırlama tokenı oluşturma
 function generatePasswordResetToken(): string {
@@ -187,17 +169,7 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "Email is required" });
       }
       
-      // Check for reCAPTCHA token
-      const recaptchaToken = req.body.recaptchaToken;
-      if (!recaptchaToken) {
-        return res.status(400).json({ message: "reCAPTCHA verification failed" });
-      }
-      
-      // Verify reCAPTCHA token
-      const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
-      if (!isRecaptchaValid) {
-        return res.status(400).json({ message: "reCAPTCHA verification failed" });
-      }
+
       
       const resetTokenData = await storage.setPasswordResetToken(email);
       
