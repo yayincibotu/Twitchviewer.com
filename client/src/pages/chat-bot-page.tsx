@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet";
-import { Navbar } from "../components/layout/navbar";
-import { LimitedTimeOfferBanner } from "../components/layout/limited-time-offer-banner";
-import { Footer } from "../components/layout/footer";
+import Navbar from "../components/layout/navbar";
+import LimitedTimeOfferBanner from "../components/sections/limited-time-offer-banner";
+import Footer from "../components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
