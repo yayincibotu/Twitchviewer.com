@@ -1,5 +1,5 @@
 import React from 'react';
-import Turnstile from 'react-cloudflare-turnstile';
+import Turnstile from 'react-turnstile';
 
 interface BasicTurnstileProps {
   onVerify: (token: string) => void;
@@ -25,10 +25,10 @@ export function BasicTurnstile({ onVerify, onExpire, onError, className }: Basic
   return (
     <div className={className}>
       <Turnstile
-        turnstileSiteKey={siteKey}
-        callback={onVerify}
-        expiredCallback={onExpire}
-        errorCallback={onError}
+        sitekey={siteKey}
+        onVerify={onVerify}
+        onExpire={onExpire}
+        onError={onError}
         theme="auto"
       />
     </div>
