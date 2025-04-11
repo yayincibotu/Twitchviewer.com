@@ -177,7 +177,7 @@ export function setupAuth(app: Express) {
       }
       
       // Continue with passport authentication
-      passport.authenticate("local", (err, user) => {
+      passport.authenticate("local", (err: Error | null, user: SelectUser | false) => {
         if (err) {
           return next(err);
         }
@@ -239,13 +239,21 @@ export function setupAuth(app: Express) {
   // Password reset request
   app.post("/api/request-password-reset", async (req, res, next) => {
     try {
-      const { email } = req.body;
+      const { email, turnstileToken } = req.body;
       
       if (!email) {
         return res.status(400).json({ message: "Email is required" });
       }
       
-
+      // Verify Turnstile Token
+      if (!turnstileToken) {
+        return res.status(400).json({ message: "Turnstile verification required" });
+      }
+      
+      const isValidTurnstile = await verifyTurnstile(turnstileToken);
+      if (!isValidTurnstile) {
+        return res.status(400).json({ message: "Turnstile verification failed" });
+      }
       
       const resetTokenData = await storage.setPasswordResetToken(email);
       

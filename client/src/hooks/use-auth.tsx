@@ -26,6 +26,7 @@ type AuthContextType = {
 const registerSchema = insertUserSchema.extend({
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string(),
+  turnstileToken: z.string().min(1, "Please complete the Turnstile verification"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -34,6 +35,7 @@ const registerSchema = insertUserSchema.extend({
 // Schema for password reset request
 const passwordResetRequestSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
+  turnstileToken: z.string().min(1, "Please complete the Turnstile verification"),
 });
 
 // Schema for password reset with token
@@ -41,13 +43,14 @@ const resetPasswordSchema = z.object({
   token: z.string().min(1, "Reset token is required"),
   newPassword: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string(),
+  turnstileToken: z.string().optional(),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
 });
 
 type RegisterData = z.infer<typeof registerSchema>;
-type LoginData = { username: string; password: string; remember?: boolean; };
+type LoginData = { username: string; password: string; remember?: boolean; turnstileToken: string; };
 type PasswordResetRequestData = z.infer<typeof passwordResetRequestSchema>;
 type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
 
