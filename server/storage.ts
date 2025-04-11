@@ -1,4 +1,15 @@
-import { users, type User, type InsertUser, packages, type Package, type InsertPackage, seoSettings, type SeoSettings, type InsertSeoSettings } from "@shared/schema";
+import { 
+  users, type User, type InsertUser, 
+  packages, type Package, type InsertPackage, 
+  seoSettings, type SeoSettings, type InsertSeoSettings,
+  statistics, type Statistic, type InsertStatistic,
+  successStories, type SuccessStory, type InsertSuccessStory,
+  faqCategories, type FaqCategory, type InsertFaqCategory,
+  faqItems, type FaqItem, type InsertFaqItem,
+  blogPosts, type BlogPost, type InsertBlogPost,
+  securityBadges, type SecurityBadge, type InsertSecurityBadge,
+  limitedTimeOffers, type LimitedTimeOffer, type InsertLimitedTimeOffer
+} from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 
@@ -27,6 +38,61 @@ export interface IStorage {
   createSeoSettings(settings: InsertSeoSettings): Promise<SeoSettings>;
   updateSeoSettings(id: number, settings: Partial<InsertSeoSettings>): Promise<SeoSettings | undefined>;
   
+  // Statistics operations
+  getStatistics(): Promise<Statistic[]>;
+  getActiveStatistics(): Promise<Statistic[]>;
+  getStatistic(id: number): Promise<Statistic | undefined>;
+  createStatistic(statistic: InsertStatistic): Promise<Statistic>;
+  updateStatistic(id: number, statistic: Partial<InsertStatistic>): Promise<Statistic | undefined>;
+  deleteStatistic(id: number): Promise<boolean>;
+  
+  // Success Stories operations
+  getSuccessStories(): Promise<SuccessStory[]>;
+  getVisibleSuccessStories(): Promise<SuccessStory[]>;
+  getSuccessStory(id: number): Promise<SuccessStory | undefined>;
+  createSuccessStory(story: InsertSuccessStory): Promise<SuccessStory>;
+  updateSuccessStory(id: number, story: Partial<InsertSuccessStory>): Promise<SuccessStory | undefined>;
+  deleteSuccessStory(id: number): Promise<boolean>;
+  
+  // FAQ operations
+  getFaqCategories(): Promise<FaqCategory[]>;
+  getFaqCategory(id: number): Promise<FaqCategory | undefined>;
+  createFaqCategory(category: InsertFaqCategory): Promise<FaqCategory>;
+  updateFaqCategory(id: number, category: Partial<InsertFaqCategory>): Promise<FaqCategory | undefined>;
+  deleteFaqCategory(id: number): Promise<boolean>;
+  
+  getFaqItems(): Promise<FaqItem[]>;
+  getFaqItemsByCategory(categoryId: number): Promise<FaqItem[]>;
+  getFaqItem(id: number): Promise<FaqItem | undefined>;
+  createFaqItem(item: InsertFaqItem): Promise<FaqItem>;
+  updateFaqItem(id: number, item: Partial<InsertFaqItem>): Promise<FaqItem | undefined>;
+  deleteFaqItem(id: number): Promise<boolean>;
+  
+  // Blog operations
+  getBlogPosts(): Promise<BlogPost[]>;
+  getPublishedBlogPosts(): Promise<BlogPost[]>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  getBlogPost(id: number): Promise<BlogPost | undefined>;
+  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  updateBlogPost(id: number, post: Partial<InsertBlogPost>): Promise<BlogPost | undefined>;
+  deleteBlogPost(id: number): Promise<boolean>;
+  
+  // Security Badges operations
+  getSecurityBadges(): Promise<SecurityBadge[]>;
+  getActiveSecurityBadges(): Promise<SecurityBadge[]>;
+  getSecurityBadge(id: number): Promise<SecurityBadge | undefined>;
+  createSecurityBadge(badge: InsertSecurityBadge): Promise<SecurityBadge>;
+  updateSecurityBadge(id: number, badge: Partial<InsertSecurityBadge>): Promise<SecurityBadge | undefined>;
+  deleteSecurityBadge(id: number): Promise<boolean>;
+  
+  // Limited Time Offers operations
+  getLimitedTimeOffers(): Promise<LimitedTimeOffer[]>;
+  getActiveLimitedTimeOffers(): Promise<LimitedTimeOffer[]>;
+  getLimitedTimeOffer(id: number): Promise<LimitedTimeOffer | undefined>;
+  createLimitedTimeOffer(offer: InsertLimitedTimeOffer): Promise<LimitedTimeOffer>;
+  updateLimitedTimeOffer(id: number, offer: Partial<InsertLimitedTimeOffer>): Promise<LimitedTimeOffer | undefined>;
+  deleteLimitedTimeOffer(id: number): Promise<boolean>;
+  
   // Session store
   sessionStore: session.SessionStore;
 }
@@ -35,18 +101,49 @@ export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private packages: Map<number, Package>;
   private seoSettings: Map<number, SeoSettings>;
+  private statistics: Map<number, Statistic>;
+  private successStories: Map<number, SuccessStory>;
+  private faqCategories: Map<number, FaqCategory>;
+  private faqItems: Map<number, FaqItem>;
+  private blogPosts: Map<number, BlogPost>;
+  private securityBadges: Map<number, SecurityBadge>;
+  private limitedTimeOffers: Map<number, LimitedTimeOffer>;
+  
   sessionStore: session.SessionStore;
   currentUserId: number;
   currentPackageId: number;
   currentSeoSettingsId: number;
+  currentStatisticId: number;
+  currentSuccessStoryId: number;
+  currentFaqCategoryId: number;
+  currentFaqItemId: number;
+  currentBlogPostId: number;
+  currentSecurityBadgeId: number;
+  currentLimitedTimeOfferId: number;
 
   constructor() {
     this.users = new Map();
     this.packages = new Map();
     this.seoSettings = new Map();
+    this.statistics = new Map();
+    this.successStories = new Map();
+    this.faqCategories = new Map();
+    this.faqItems = new Map();
+    this.blogPosts = new Map();
+    this.securityBadges = new Map();
+    this.limitedTimeOffers = new Map();
+    
     this.currentUserId = 1;
     this.currentPackageId = 1;
     this.currentSeoSettingsId = 1;
+    this.currentStatisticId = 1;
+    this.currentSuccessStoryId = 1;
+    this.currentFaqCategoryId = 1;
+    this.currentFaqItemId = 1;
+    this.currentBlogPostId = 1;
+    this.currentSecurityBadgeId = 1;
+    this.currentLimitedTimeOfferId = 1;
+    
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000, // 24 hours
     });
@@ -221,6 +318,250 @@ export class MemStorage implements IStorage {
     const updatedSettings = { ...settings, ...settingsUpdate };
     this.seoSettings.set(id, updatedSettings);
     return updatedSettings;
+  }
+  
+  // Statistics operations
+  async getStatistics(): Promise<Statistic[]> {
+    return Array.from(this.statistics.values());
+  }
+  
+  async getActiveStatistics(): Promise<Statistic[]> {
+    return Array.from(this.statistics.values()).filter(stat => stat.isActive);
+  }
+  
+  async getStatistic(id: number): Promise<Statistic | undefined> {
+    return this.statistics.get(id);
+  }
+  
+  async createStatistic(statistic: InsertStatistic): Promise<Statistic> {
+    const id = this.currentStatisticId++;
+    const newStatistic: Statistic = { ...statistic, id };
+    this.statistics.set(id, newStatistic);
+    return newStatistic;
+  }
+  
+  async updateStatistic(id: number, update: Partial<InsertStatistic>): Promise<Statistic | undefined> {
+    const statistic = this.statistics.get(id);
+    if (!statistic) return undefined;
+    
+    const updatedStatistic = { ...statistic, ...update };
+    this.statistics.set(id, updatedStatistic);
+    return updatedStatistic;
+  }
+  
+  async deleteStatistic(id: number): Promise<boolean> {
+    return this.statistics.delete(id);
+  }
+  
+  // Success Stories operations
+  async getSuccessStories(): Promise<SuccessStory[]> {
+    return Array.from(this.successStories.values());
+  }
+  
+  async getVisibleSuccessStories(): Promise<SuccessStory[]> {
+    return Array.from(this.successStories.values()).filter(story => story.isVisible);
+  }
+  
+  async getSuccessStory(id: number): Promise<SuccessStory | undefined> {
+    return this.successStories.get(id);
+  }
+  
+  async createSuccessStory(story: InsertSuccessStory): Promise<SuccessStory> {
+    const id = this.currentSuccessStoryId++;
+    const newStory: SuccessStory = { ...story, id };
+    this.successStories.set(id, newStory);
+    return newStory;
+  }
+  
+  async updateSuccessStory(id: number, update: Partial<InsertSuccessStory>): Promise<SuccessStory | undefined> {
+    const story = this.successStories.get(id);
+    if (!story) return undefined;
+    
+    const updatedStory = { ...story, ...update };
+    this.successStories.set(id, updatedStory);
+    return updatedStory;
+  }
+  
+  async deleteSuccessStory(id: number): Promise<boolean> {
+    return this.successStories.delete(id);
+  }
+  
+  // FAQ operations
+  async getFaqCategories(): Promise<FaqCategory[]> {
+    return Array.from(this.faqCategories.values());
+  }
+  
+  async getFaqCategory(id: number): Promise<FaqCategory | undefined> {
+    return this.faqCategories.get(id);
+  }
+  
+  async createFaqCategory(category: InsertFaqCategory): Promise<FaqCategory> {
+    const id = this.currentFaqCategoryId++;
+    const newCategory: FaqCategory = { ...category, id };
+    this.faqCategories.set(id, newCategory);
+    return newCategory;
+  }
+  
+  async updateFaqCategory(id: number, update: Partial<InsertFaqCategory>): Promise<FaqCategory | undefined> {
+    const category = this.faqCategories.get(id);
+    if (!category) return undefined;
+    
+    const updatedCategory = { ...category, ...update };
+    this.faqCategories.set(id, updatedCategory);
+    return updatedCategory;
+  }
+  
+  async deleteFaqCategory(id: number): Promise<boolean> {
+    // Also delete all items in this category
+    Array.from(this.faqItems.values())
+      .filter(item => item.categoryId === id)
+      .forEach(item => this.faqItems.delete(item.id));
+      
+    return this.faqCategories.delete(id);
+  }
+  
+  async getFaqItems(): Promise<FaqItem[]> {
+    return Array.from(this.faqItems.values());
+  }
+  
+  async getFaqItemsByCategory(categoryId: number): Promise<FaqItem[]> {
+    return Array.from(this.faqItems.values())
+      .filter(item => item.categoryId === categoryId)
+      .sort((a, b) => a.order - b.order);
+  }
+  
+  async getFaqItem(id: number): Promise<FaqItem | undefined> {
+    return this.faqItems.get(id);
+  }
+  
+  async createFaqItem(item: InsertFaqItem): Promise<FaqItem> {
+    const id = this.currentFaqItemId++;
+    const newItem: FaqItem = { ...item, id };
+    this.faqItems.set(id, newItem);
+    return newItem;
+  }
+  
+  async updateFaqItem(id: number, update: Partial<InsertFaqItem>): Promise<FaqItem | undefined> {
+    const item = this.faqItems.get(id);
+    if (!item) return undefined;
+    
+    const updatedItem = { ...item, ...update };
+    this.faqItems.set(id, updatedItem);
+    return updatedItem;
+  }
+  
+  async deleteFaqItem(id: number): Promise<boolean> {
+    return this.faqItems.delete(id);
+  }
+  
+  // Blog operations
+  async getBlogPosts(): Promise<BlogPost[]> {
+    return Array.from(this.blogPosts.values());
+  }
+  
+  async getPublishedBlogPosts(): Promise<BlogPost[]> {
+    return Array.from(this.blogPosts.values())
+      .filter(post => post.isPublished);
+  }
+  
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    return Array.from(this.blogPosts.values())
+      .find(post => post.slug === slug);
+  }
+  
+  async getBlogPost(id: number): Promise<BlogPost | undefined> {
+    return this.blogPosts.get(id);
+  }
+  
+  async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
+    const id = this.currentBlogPostId++;
+    const newPost: BlogPost = { ...post, id };
+    this.blogPosts.set(id, newPost);
+    return newPost;
+  }
+  
+  async updateBlogPost(id: number, update: Partial<InsertBlogPost>): Promise<BlogPost | undefined> {
+    const post = this.blogPosts.get(id);
+    if (!post) return undefined;
+    
+    const updatedPost = { ...post, ...update };
+    this.blogPosts.set(id, updatedPost);
+    return updatedPost;
+  }
+  
+  async deleteBlogPost(id: number): Promise<boolean> {
+    return this.blogPosts.delete(id);
+  }
+  
+  // Security Badges operations
+  async getSecurityBadges(): Promise<SecurityBadge[]> {
+    return Array.from(this.securityBadges.values());
+  }
+  
+  async getActiveSecurityBadges(): Promise<SecurityBadge[]> {
+    return Array.from(this.securityBadges.values())
+      .filter(badge => badge.isActive);
+  }
+  
+  async getSecurityBadge(id: number): Promise<SecurityBadge | undefined> {
+    return this.securityBadges.get(id);
+  }
+  
+  async createSecurityBadge(badge: InsertSecurityBadge): Promise<SecurityBadge> {
+    const id = this.currentSecurityBadgeId++;
+    const newBadge: SecurityBadge = { ...badge, id };
+    this.securityBadges.set(id, newBadge);
+    return newBadge;
+  }
+  
+  async updateSecurityBadge(id: number, update: Partial<InsertSecurityBadge>): Promise<SecurityBadge | undefined> {
+    const badge = this.securityBadges.get(id);
+    if (!badge) return undefined;
+    
+    const updatedBadge = { ...badge, ...update };
+    this.securityBadges.set(id, updatedBadge);
+    return updatedBadge;
+  }
+  
+  async deleteSecurityBadge(id: number): Promise<boolean> {
+    return this.securityBadges.delete(id);
+  }
+  
+  // Limited Time Offers operations
+  async getLimitedTimeOffers(): Promise<LimitedTimeOffer[]> {
+    return Array.from(this.limitedTimeOffers.values());
+  }
+  
+  async getActiveLimitedTimeOffers(): Promise<LimitedTimeOffer[]> {
+    const now = new Date();
+    return Array.from(this.limitedTimeOffers.values())
+      .filter(offer => offer.isActive && 
+        new Date(offer.startDate) <= now && 
+        new Date(offer.endDate) >= now);
+  }
+  
+  async getLimitedTimeOffer(id: number): Promise<LimitedTimeOffer | undefined> {
+    return this.limitedTimeOffers.get(id);
+  }
+  
+  async createLimitedTimeOffer(offer: InsertLimitedTimeOffer): Promise<LimitedTimeOffer> {
+    const id = this.currentLimitedTimeOfferId++;
+    const newOffer: LimitedTimeOffer = { ...offer, id };
+    this.limitedTimeOffers.set(id, newOffer);
+    return newOffer;
+  }
+  
+  async updateLimitedTimeOffer(id: number, update: Partial<InsertLimitedTimeOffer>): Promise<LimitedTimeOffer | undefined> {
+    const offer = this.limitedTimeOffers.get(id);
+    if (!offer) return undefined;
+    
+    const updatedOffer = { ...offer, ...update };
+    this.limitedTimeOffers.set(id, updatedOffer);
+    return updatedOffer;
+  }
+  
+  async deleteLimitedTimeOffer(id: number): Promise<boolean> {
+    return this.limitedTimeOffers.delete(id);
   }
 }
 
