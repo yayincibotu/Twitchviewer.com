@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth, registerSchema, passwordResetRequestSchema, resetPasswordSchema } from "@/hooks/use-auth";
 import { Loader2, ArrowLeft, Check, LucideRocket } from "lucide-react";
+import { TurnstileWidget } from "@/components/ui/turnstile";
 
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
@@ -19,7 +20,6 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SiTwitch } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
-import { TurnstileWidget } from "@/components/ui/turnstile";
 
 
 
