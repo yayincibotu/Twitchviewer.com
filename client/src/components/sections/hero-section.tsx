@@ -52,9 +52,9 @@ export default function HeroSection({ onGetStarted }: HeroSectionProps) {
             Live Now: {viewerCount.toLocaleString()} viewers on our network
           </div>
           
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight bg-gradient-to-r from-primary via-violet-600 to-purple-600 bg-clip-text text-transparent">
-            <span className="animate-slide-down inline-block">Boost Your Twitch Channel</span><br />
-            <span className="animate-slide-up inline-block" style={{animationDelay: '0.3s'}}>With Real Viewers</span>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+            <span className="animate-slide-down inline-block bg-gradient-to-r from-primary via-violet-600 to-purple-600 bg-clip-text text-transparent">Boost Your Twitch Channel</span><br />
+            <span className="animate-slide-up inline-block text-neutral-800" style={{animationDelay: '0.3s'}}>With Real Viewers</span>
           </h1>
           
           <p className="mt-6 text-lg md:text-xl text-neutral-600 max-w-2xl mx-auto animate-fade-in" style={{animationDelay: '0.5s'}}>
