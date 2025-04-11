@@ -27,7 +27,9 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByTwitchId(twitchId: string): Promise<User | undefined>;
   getUserByPasswordResetToken(token: string): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, userData: Partial<InsertUser>): Promise<User | undefined>;
   verifyUserEmail(id: number): Promise<User | undefined>;
   updateUserRole(id: number, role: string): Promise<User | undefined>;
   updateUserStripeInfo(id: number, stripeInfo: { stripeCustomerId: string, stripeSubscriptionId: string }): Promise<User | undefined>;
@@ -991,9 +993,18 @@ export class DatabaseStorage implements IStorage {
       .limit(1);
     return result[0];
   }
+  
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users).orderBy(users.id);
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const result = await db.insert(users).values(insertUser).returning();
+    return result[0];
+  }
+  
+  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User | undefined> {
+    const result = await db.update(users).set(userData).where(eq(users.id, id)).returning();
     return result[0];
   }
 

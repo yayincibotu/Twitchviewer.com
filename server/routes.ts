@@ -102,6 +102,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ----- User Routes -----
   
+  // Get all users (admin only)
+  app.get("/api/users", checkIsAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching users: " + error.message });
+    }
+  });
+  
+  // Get a single user (admin only)
+  app.get("/api/users/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Şifreyi hariç tutarak kullanıcı bilgilerini döndür
+      const { password, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error fetching user: " + error.message });
+    }
+  });
+  
+  // Update a user (admin only)
+  app.patch("/api/users/:id", checkIsAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const updatedUser = await storage.updateUser(userId, req.body);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Şifreyi hariç tutarak güncellenmiş kullanıcı bilgilerini döndür
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error updating user: " + error.message });
+    }
+  });
+  
   // Check if user has subscription
   app.get("/api/subscription", async (req, res) => {
     if (!req.isAuthenticated()) {
