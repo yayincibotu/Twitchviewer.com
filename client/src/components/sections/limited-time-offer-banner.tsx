@@ -50,12 +50,12 @@ export default function LimitedTimeOfferBanner() {
     }
   }, []);
 
-  // Geri sayım sayacını güncelle
+  // Update the countdown timer
   useEffect(() => {
     if (!offers || offers.length === 0) return;
 
-    // Aktif teklifleri filtrele
-    const activeOffer = offers[0]; // Varsayılan olarak ilk aktif teklifi kullan
+    // Filter active offers
+    const activeOffer = offers[0]; // Use the first active offer by default
     if (!activeOffer) return;
 
     const endDate = new Date(activeOffer.endDate);
@@ -66,17 +66,17 @@ export default function LimitedTimeOfferBanner() {
       
       if (diff <= 0) {
         clearInterval(timer);
-        setTimeLeft("Teklif sona erdi");
+        setTimeLeft("Offer expired");
         return;
       }
       
-      // Geri sayım formatını hesapla
+      // Calculate countdown format
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
       const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
       
-      setTimeLeft(`${days}g ${hours}s ${minutes}d ${seconds}sn`);
+      setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
     }, 1000);
     
     return () => clearInterval(timer);
@@ -99,14 +99,14 @@ export default function LimitedTimeOfferBanner() {
   const offeredPackage = packages?.find(pkg => pkg.id === offer.packageId);
 
   return (
-    <div className="bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 px-4 relative overflow-hidden">
-      {/* Arka plan efekti */}
+    <div className="bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 relative overflow-hidden">
+      {/* Background effect */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -left-4 -top-4 w-24 h-24 rounded-full bg-white opacity-10 animate-pulse"></div>
         <div className="absolute right-10 bottom-0 w-16 h-16 rounded-full bg-white opacity-10 animate-pulse delay-300"></div>
       </div>
       
-      <div className="container mx-auto relative">
+      <div className="container mx-auto px-4 relative">
         <button 
           onClick={dismissBanner}
           className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-neutral-200"
@@ -129,14 +129,14 @@ export default function LimitedTimeOfferBanner() {
           <div className="flex flex-col md:flex-row items-center gap-3 md:gap-6">
             <div className="flex items-center">
               <Clock className="mr-2 h-5 w-5 text-yellow-300" />
-              <span>Kalan süre: <strong>{timeLeft}</strong></span>
+              <span>Time left: <strong>{timeLeft}</strong></span>
             </div>
             
             <Button 
               onClick={() => setLocation("/pricing")}
               className="bg-white text-purple-700 hover:bg-neutral-100 border-none"
             >
-              Şimdi Kaydol
+              Sign Up Now
             </Button>
           </div>
         </div>
