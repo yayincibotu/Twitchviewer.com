@@ -7,6 +7,9 @@ import { motion } from "framer-motion";
 import { Sparkles, Check, ArrowRight, Shield } from "lucide-react";
 import { Helmet } from "react-helmet";
 import { useLocation } from "wouter";
+import Navbar from "@/components/layout/navbar";
+import Footer from "@/components/layout/footer";
+import LimitedTimeOfferBanner from "@/components/sections/limited-time-offer-banner";
 
 export default function PricingPage() {
   const [selectedInterval, setSelectedInterval] = useState<'monthly'|'annually'>('monthly');
@@ -56,7 +59,9 @@ export default function PricingPage() {
         <meta name="keywords" content="Twitch viewers, Twitch growth, Twitch pricing, stream viewers" />
       </Helmet>
       
-      <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-neutral-100">
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-neutral-50 to-neutral-100">
+        <LimitedTimeOfferBanner />
+        <Navbar />
         {/* Hero Section with Gradient Background */}
         <div className="relative overflow-hidden pt-24 pb-32">
           {/* Abstract background elements */}
@@ -347,6 +352,8 @@ export default function PricingPage() {
             </Button>
           </div>
         </div>
+        
+        <Footer />
       </div>
     </>
   );
