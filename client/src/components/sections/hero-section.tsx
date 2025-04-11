@@ -1,27 +1,127 @@
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface HeroSectionProps {
   onGetStarted: () => void;
 }
 
+interface ChatMessage {
+  id: number;
+  username: string;
+  message: string;
+  color: string;
+  timestamp: Date;
+}
+
+interface EventNotification {
+  id: number;
+  type: 'follow' | 'subscription' | 'donation';
+  username: string;
+  amount?: number;
+  timestamp: Date;
+}
+
 export default function HeroSection({ onGetStarted }: HeroSectionProps) {
   const [viewerCount, setViewerCount] = useState(0);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [notifications, setNotifications] = useState<EventNotification[]>([]);
   const [isScrolled, setIsScrolled] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
   
-  // Simüle edilmiş gerçek zamanlı izleyici sayısı animasyonu
+  const getRandomUsername = () => {
+    const usernames = [
+      'TwitchFan', 'GameLover', 'StreamViewer', 'PurpleFan', 
+      'ViewerBot', 'ChatterPro', 'StreamSupport', 'TwitchLurker', 
+      'ViewerOne', 'ChatChamp', 'StreamHelper', 'TwitchGrow',
+      'GamingLife', 'StreamBooster', 'LoyalViewer'
+    ];
+    const randomNumber = Math.floor(Math.random() * 1000);
+    return `${usernames[Math.floor(Math.random() * usernames.length)]}${randomNumber}`;
+  };
+  
+  const getRandomColor = () => {
+    const colors = ['#ff4500', '#0e9216', '#1e90ff', '#9147ff', '#f2a900', '#00ced1', '#ff69b4', '#2ecc71'];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+  
+  const getRandomMessage = () => {
+    const messages = [
+      'Great stream today!',
+      'Love the content!',
+      'Wow, that was amazing!',
+      'How long have you been streaming?',
+      'First time here, loving it!',
+      'Hello from Germany!',
+      'Followed! Great content!',
+      'Keep it up!',
+      'This stream is fire!',
+      'LUL',
+      'PogChamp',
+      'What game is next?',
+      'You are so skilled!',
+      'Can you do a tutorial on that?',
+      'Your channel is growing fast!',
+      'Quality content as always'
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  };
+  
+  // Simüle edilmiş gerçek zamanlı izleyici sayısı ve chat animasyonu
   useEffect(() => {
     const target = 1572;
     const initialValue = Math.floor(target * 0.9);
     setViewerCount(initialValue);
     
-    const interval = setInterval(() => {
+    // Add initial chat messages
+    const initialMessages: ChatMessage[] = Array.from({ length: 5 }, (_, i) => ({
+      id: i,
+      username: getRandomUsername(),
+      message: getRandomMessage(),
+      color: getRandomColor(),
+      timestamp: new Date(Date.now() - Math.floor(Math.random() * 300000))
+    }));
+    
+    setChatMessages(initialMessages);
+    
+    // Simulate viewer count changing
+    const viewerInterval = setInterval(() => {
       setViewerCount(prev => {
-        const change = Math.floor(Math.random() * 5) - 2; // -2 ile +2 arasında değişim
-        const newValue = Math.max(initialValue, Math.min(prev + change, target + 10));
+        const change = Math.floor(Math.random() * 5) - 1; // -1 to +3 range for more growth
+        const newValue = Math.max(initialValue, Math.min(prev + change, target + 30));
         return newValue;
       });
     }, 3000);
+    
+    // Simulate new chat messages
+    const chatInterval = setInterval(() => {
+      const newMessage: ChatMessage = {
+        id: Date.now(),
+        username: getRandomUsername(),
+        message: getRandomMessage(),
+        color: getRandomColor(),
+        timestamp: new Date()
+      };
+      
+      setChatMessages(prev => [...prev.slice(-9), newMessage]); // Keep last 10 messages
+    }, 4000);
+    
+    // Simulate follower/subscriber events
+    const notificationInterval = setInterval(() => {
+      if (Math.random() > 0.5) { // 50% chance to show notification
+        const eventTypes: ('follow' | 'subscription' | 'donation')[] = ['follow', 'subscription', 'donation'];
+        const eventType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+        
+        const newNotification: EventNotification = {
+          id: Date.now(),
+          type: eventType,
+          username: getRandomUsername(),
+          amount: eventType === 'donation' ? Math.floor(Math.random() * 50) + 5 : undefined,
+          timestamp: new Date()
+        };
+        
+        setNotifications(prev => [...prev.slice(-2), newNotification]); // Keep last 3 notifications
+      }
+    }, 13000);
     
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -30,7 +130,9 @@ export default function HeroSection({ onGetStarted }: HeroSectionProps) {
     window.addEventListener("scroll", handleScroll);
     
     return () => {
-      clearInterval(interval);
+      clearInterval(viewerInterval);
+      clearInterval(chatInterval);
+      clearInterval(notificationInterval);
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
@@ -151,49 +253,122 @@ export default function HeroSection({ onGetStarted }: HeroSectionProps) {
                 </div>
               </div>
               
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                <div className="bg-neutral-800/40 rounded-lg p-3">
-                  <div className="text-neutral-400 text-xs mb-1">Current Viewers</div>
-                  <div className="text-white text-xl font-bold">{(viewerCount * 0.1).toFixed(0)}</div>
-                  <div className="text-green-400 text-xs flex items-center mt-1">
-                    <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M7 14l5-5 5 5H7z" />
-                    </svg>
-                    +12.4%
+              <div className="grid grid-cols-12 gap-3 mb-4">
+                {/* Left side - Stats */}
+                <div className="col-span-4 grid grid-rows-3 gap-3">
+                  <div className="bg-neutral-800/40 rounded-lg p-3">
+                    <div className="text-neutral-400 text-xs mb-1">Current Viewers</div>
+                    <div className="text-white text-xl font-bold">{(viewerCount * 0.1).toFixed(0)}</div>
+                    <div className="text-green-400 text-xs flex items-center mt-1">
+                      <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M7 14l5-5 5 5H7z" />
+                      </svg>
+                      +12.4%
+                    </div>
+                  </div>
+                  <div className="bg-neutral-800/40 rounded-lg p-3">
+                    <div className="text-neutral-400 text-xs mb-1">Followers Today</div>
+                    <div className="text-white text-xl font-bold">26</div>
+                    <div className="text-green-400 text-xs flex items-center mt-1">
+                      <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M7 14l5-5 5 5H7z" />
+                      </svg>
+                      +7.8%
+                    </div>
+                  </div>
+                  <div className="bg-neutral-800/40 rounded-lg p-3">
+                    <div className="text-neutral-400 text-xs mb-1">Channel Rank</div>
+                    <div className="text-white text-xl font-bold">#1,342</div>
+                    <div className="text-green-400 text-xs flex items-center mt-1">
+                      <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M7 14l5-5 5 5H7z" />
+                      </svg>
+                      +128
+                    </div>
                   </div>
                 </div>
-                <div className="bg-neutral-800/40 rounded-lg p-3">
-                  <div className="text-neutral-400 text-xs mb-1">Followers Today</div>
-                  <div className="text-white text-xl font-bold">26</div>
-                  <div className="text-green-400 text-xs flex items-center mt-1">
-                    <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M7 14l5-5 5 5H7z" />
-                    </svg>
-                    +7.8%
+                
+                {/* Middle - Chart */}
+                <div className="col-span-4 flex flex-col bg-neutral-800/30 rounded-lg p-3">
+                  <div className="text-neutral-400 text-xs mb-2">Viewer Activity (Last 24 hours)</div>
+                  <div className="flex-1 flex items-end">
+                    <div className="flex-1 flex items-end space-x-1">
+                      {[15, 25, 20, 30, 35, 40, 42, 50, 45, 48, 60, 70, 65, 75, 85, 80, 90, 100, 95, 98].map((height, i) => (
+                        <div 
+                          key={i} 
+                          className="flex-1 bg-gradient-to-t from-primary to-purple-600 rounded-sm" 
+                          style={{ height: `${height}%`, transitionDelay: `${i * 50}ms` }}
+                        ></div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className="bg-neutral-800/40 rounded-lg p-3">
-                  <div className="text-neutral-400 text-xs mb-1">Channel Rank</div>
-                  <div className="text-white text-xl font-bold">#1,342</div>
-                  <div className="text-green-400 text-xs flex items-center mt-1">
-                    <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M7 14l5-5 5 5H7z" />
-                    </svg>
-                    +128
+                
+                {/* Right side - Chat and Notifications */}
+                <div className="col-span-4 flex flex-col gap-3">
+                  {/* Chat box */}
+                  <div className="flex-1 flex flex-col bg-neutral-800/50 rounded-lg overflow-hidden">
+                    <div className="bg-neutral-800/80 px-3 py-2 flex items-center">
+                      <svg className="w-4 h-4 text-neutral-400 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" />
+                      </svg>
+                      <div className="text-neutral-300 text-xs">Chat</div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-2 h-28 bg-neutral-900/50">
+                      {chatMessages.map(message => (
+                        <div key={message.id} className="mb-1 last:mb-0 animate-fade-in">
+                          <span className="text-xs" style={{ color: message.color }}>
+                            {message.username}:
+                          </span>
+                          <span className="text-xs text-neutral-300 ml-1">{message.message}</span>
+                        </div>
+                      ))}
+                      <div ref={chatEndRef} />
+                    </div>
                   </div>
-                </div>
-              </div>
-              
-              <div className="flex-1 bg-neutral-800/30 rounded-lg p-3 flex flex-col">
-                <div className="text-neutral-400 text-xs mb-2">Viewer Activity (Last 24 hours)</div>
-                <div className="flex-1 flex items-end">
-                  <div className="flex-1 flex items-end space-x-1">
-                    {[15, 25, 20, 30, 35, 40, 42, 50, 45, 48, 60, 70, 65, 75, 85, 80, 90, 100, 95, 98].map((height, i) => (
-                      <div 
-                        key={i} 
-                        className="flex-1 bg-gradient-to-t from-primary to-purple-600 rounded-sm" 
-                        style={{ height: `${height}%`, transitionDelay: `${i * 50}ms` }}
-                      ></div>
+                  
+                  {/* Notifications */}
+                  <div className="h-32 bg-neutral-800/30 rounded-lg p-2 overflow-hidden">
+                    {notifications.map((notification) => (
+                      <div key={notification.id} className="mb-2 last:mb-0 p-2 bg-purple-500/20 rounded-md border border-purple-500/20 animate-slide-right">
+                        {notification.type === 'follow' && (
+                          <div className="flex items-center">
+                            <div className="mr-2 bg-purple-600/30 p-1 rounded">
+                              <svg className="w-3 h-3 text-purple-400" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+                              </svg>
+                            </div>
+                            <div className="text-xs text-neutral-200">
+                              <span className="font-semibold text-purple-300">{notification.username}</span> just followed!
+                            </div>
+                          </div>
+                        )}
+                        {notification.type === 'subscription' && (
+                          <div className="flex items-center">
+                            <div className="mr-2 bg-blue-600/30 p-1 rounded">
+                              <svg className="w-3 h-3 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20 8H4V6h16v2zm-2-6H6v2h12V2zm4 10v8c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2v-8c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2zm-6 4l-6-3.27v6.53L16 16z" />
+                              </svg>
+                            </div>
+                            <div className="text-xs text-neutral-200">
+                              <span className="font-semibold text-blue-300">{notification.username}</span> subscribed!
+                            </div>
+                          </div>
+                        )}
+                        {notification.type === 'donation' && (
+                          <div className="flex items-center">
+                            <div className="mr-2 bg-green-600/30 p-1 rounded">
+                              <svg className="w-3 h-3 text-green-400" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" />
+                              </svg>
+                            </div>
+                            <div className="text-xs text-neutral-200">
+                              <span className="font-semibold text-green-300">{notification.username}</span> donated{' '}
+                              <span className="font-bold text-green-300">${notification.amount}</span>!
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>
