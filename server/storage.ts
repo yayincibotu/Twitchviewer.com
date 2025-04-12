@@ -982,7 +982,7 @@ By implementing these strategies consistently, you'll be well on your way to gro
   
   async getMediaFilesByUser(userId: number): Promise<MediaFile[]> {
     return Array.from(this.mediaFiles.values()).filter(
-      (file) => file.userId === userId
+      (file) => file.uploadedBy === userId
     );
   }
   
@@ -1461,7 +1461,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getMediaFilesByUser(userId: number): Promise<MediaFile[]> {
-    return await db.select().from(mediaFiles).where(eq(mediaFiles.userId, userId)).orderBy(mediaFiles.uploadedAt, 'desc');
+    return await db.select().from(mediaFiles).where(eq(mediaFiles.uploadedBy, userId)).orderBy(mediaFiles.uploadedAt, 'desc');
   }
   
   async getMediaFile(id: number): Promise<MediaFile | undefined> {
