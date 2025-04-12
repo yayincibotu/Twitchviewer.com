@@ -19,6 +19,7 @@ const AdminUsers = lazy(() => import("@/pages/admin/users"));
 const AdminPackages = lazy(() => import("@/pages/admin/packages"));
 const AdminBlog = lazy(() => import("@/pages/admin/blog"));
 const AdminBlogForm = lazy(() => import("@/pages/admin/blog-form"));
+const AdminMedia = lazy(() => import("@/pages/admin/media"));
 const CheckoutPage = lazy(() => import("@/pages/checkout"));
 const PricingPage = lazy(() => import("@/pages/pricing-page"));
 const ViewerBotPage = lazy(() => import("@/pages/viewer-bot-page"));
@@ -56,6 +57,7 @@ function Router() {
         <ProtectedRoute path="/admin/blog" component={AdminBlog} requireAdmin />
         <ProtectedRoute path="/admin/blog/new" component={AdminBlogForm} requireAdmin />
         <ProtectedRoute path="/admin/blog/:id" component={AdminBlogForm} requireAdmin />
+        <ProtectedRoute path="/admin/media" component={AdminMedia} requireAdmin />
         <ProtectedRoute path="/checkout/:packageId" component={CheckoutPage} />
         <Route component={NotFound} />
       </Switch>
