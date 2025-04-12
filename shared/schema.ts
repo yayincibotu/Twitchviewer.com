@@ -121,6 +121,19 @@ export const limitedTimeOffers = pgTable("limited_time_offers", {
   isActive: boolean("is_active").notNull().default(true),
 });
 
+// Media Files
+export const mediaFiles = pgTable("media_files", {
+  id: serial("id").primaryKey(),
+  filename: text("filename").notNull(),
+  url: text("url").notNull(),
+  mimeType: text("mime_type").notNull(),
+  size: integer("size").notNull(),
+  width: integer("width"),
+  height: integer("height"),
+  uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
+  uploadedBy: integer("uploaded_by").references(() => users.id),
+});
+
 // Validation Schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -250,3 +263,15 @@ export type SecurityBadge = typeof securityBadges.$inferSelect;
 
 export type InsertLimitedTimeOffer = z.infer<typeof insertLimitedTimeOfferSchema>;
 export type LimitedTimeOffer = typeof limitedTimeOffers.$inferSelect;
+
+export const insertMediaFileSchema = createInsertSchema(mediaFiles).pick({
+  filename: true,
+  url: true,
+  mimeType: true,
+  size: true,
+  width: true,
+  height: true,
+  uploadedBy: true,
+});
+export type InsertMediaFile = z.infer<typeof insertMediaFileSchema>;
+export type MediaFile = typeof mediaFiles.$inferSelect;
