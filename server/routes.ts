@@ -102,6 +102,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const stripe = new Stripe(stripeSecretKey, {
     apiVersion: "2023-10-16",
   });
+  
+  // Set up file upload storage with multer
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "./uploads/media");
+    },
+    filename: (req, file, cb) => {
+      // Generate unique filename with original extension
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const ext = path.extname(file.originalname);
+      cb(null, uniqueSuffix + ext);
+    }
+  });
+  
+  // File filter to accept only images
+  const fileFilter = (req: any, file: any, cb: any) => {
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPG, PNG, GIF, WebP and SVG files are allowed.'), false);
+    }
+  };
+  
+  const upload = multer({ 
+    storage,
+    fileFilter,
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB limit
+    }
+  });
 
   // ----- User Routes -----
   
