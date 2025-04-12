@@ -9,7 +9,8 @@ import {
   faqItems, type FaqItem, type InsertFaqItem,
   blogPosts, type BlogPost, type InsertBlogPost,
   securityBadges, type SecurityBadge, type InsertSecurityBadge,
-  limitedTimeOffers, type LimitedTimeOffer, type InsertLimitedTimeOffer
+  limitedTimeOffers, type LimitedTimeOffer, type InsertLimitedTimeOffer,
+  mediaFiles, type MediaFile, type InsertMediaFile
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
@@ -105,6 +106,13 @@ export interface IStorage {
   createLimitedTimeOffer(offer: InsertLimitedTimeOffer): Promise<LimitedTimeOffer>;
   updateLimitedTimeOffer(id: number, offer: Partial<InsertLimitedTimeOffer>): Promise<LimitedTimeOffer | undefined>;
   deleteLimitedTimeOffer(id: number): Promise<boolean>;
+  
+  // Media Files operations
+  getMediaFiles(): Promise<MediaFile[]>;
+  getMediaFilesByUser(userId: number): Promise<MediaFile[]>;
+  getMediaFile(id: number): Promise<MediaFile | undefined>;
+  createMediaFile(file: InsertMediaFile): Promise<MediaFile>;
+  deleteMediaFile(id: number): Promise<boolean>;
   
   // Session store
   sessionStore: any;
