@@ -112,7 +112,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Set up file upload storage with multer
-  const storage = multer.diskStorage({
+  const uploadStorage = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, "./uploads/media");
     },
@@ -135,7 +135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
   
   const upload = multer({ 
-    storage,
+    storage: uploadStorage,
     fileFilter,
     limits: {
       fileSize: 5 * 1024 * 1024, // 5MB limit
