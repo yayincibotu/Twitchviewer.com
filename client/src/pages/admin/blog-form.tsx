@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import AdminLayout from "@/components/admin/admin-layout";
+import MediaLibrary from "@/components/admin/media-library";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -412,14 +413,14 @@ export default function BlogFormPage() {
                               {...field}
                               value={field.value || ""}
                             />
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              className="ml-2"
+                            <MediaLibrary 
+                              onSelect={(url) => field.onChange(url)}
+                              buttonVariant="outline"
+                              buttonSize="icon"
+                              selectedMedia={field.value}
                             >
                               <ImageIcon className="h-4 w-4" />
-                            </Button>
+                            </MediaLibrary>
                           </div>
                         </FormControl>
                         <FormMessage />
