@@ -12,11 +12,7 @@ import {
   Star,
   FileText,
   ShieldCheck,
-  Clock,
-  BookOpen,
-  Pencil,
-  FileEdit,
-  Image as ImageIcon
+  Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -149,38 +145,10 @@ export default function AdminSidebar() {
         </NavGroup>
         
         <NavGroup 
-          title="Blog" 
-          icon={<BookOpen className="h-5 w-5" />}
-          defaultOpen={location.startsWith("/admin/blog")}
-        >
-          <NavItem 
-            href="/admin/blog" 
-            icon={<BookOpen className="h-4 w-4" />} 
-            isActive={location === "/admin/blog"}
-          >
-            All Posts
-          </NavItem>
-          <NavItem 
-            href="/admin/blog/new" 
-            icon={<FileEdit className="h-4 w-4" />} 
-            isActive={location === "/admin/blog/new"}
-          >
-            Create Post
-          </NavItem>
-        </NavGroup>
-        
-        <NavGroup 
           title="Content" 
           icon={<FileText className="h-5 w-5" />}
-          defaultOpen={location.startsWith("/admin/content") || location.startsWith("/admin/media")}
+          defaultOpen={location.startsWith("/admin/content")}
         >
-          <NavItem 
-            href="/admin/media" 
-            icon={<ImageIcon className="h-4 w-4" />} 
-            isActive={location === "/admin/media"}
-          >
-            Media Library
-          </NavItem>
           <NavItem 
             href="/admin/content/seo" 
             icon={<Globe className="h-4 w-4" />} 

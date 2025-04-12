@@ -9,8 +9,7 @@ import {
   faqItems, type FaqItem, type InsertFaqItem,
   blogPosts, type BlogPost, type InsertBlogPost,
   securityBadges, type SecurityBadge, type InsertSecurityBadge,
-  limitedTimeOffers, type LimitedTimeOffer, type InsertLimitedTimeOffer,
-  mediaFiles, type MediaFile, type InsertMediaFile
+  limitedTimeOffers, type LimitedTimeOffer, type InsertLimitedTimeOffer
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
@@ -107,13 +106,6 @@ export interface IStorage {
   updateLimitedTimeOffer(id: number, offer: Partial<InsertLimitedTimeOffer>): Promise<LimitedTimeOffer | undefined>;
   deleteLimitedTimeOffer(id: number): Promise<boolean>;
   
-  // Media Files operations
-  getMediaFiles(): Promise<MediaFile[]>;
-  getMediaFilesByUser(userId: number): Promise<MediaFile[]>;
-  getMediaFile(id: number): Promise<MediaFile | undefined>;
-  createMediaFile(file: InsertMediaFile): Promise<MediaFile>;
-  deleteMediaFile(id: number): Promise<boolean>;
-  
   // Session store
   sessionStore: any;
 }
@@ -143,7 +135,6 @@ export class MemStorage implements IStorage {
   private blogPosts: Map<number, BlogPost>;
   private securityBadges: Map<number, SecurityBadge>;
   private limitedTimeOffers: Map<number, LimitedTimeOffer>;
-  private mediaFiles: Map<number, MediaFile>;
   
   sessionStore: any;
   currentUserId: number;
@@ -156,7 +147,6 @@ export class MemStorage implements IStorage {
   currentBlogPostId: number;
   currentSecurityBadgeId: number;
   currentLimitedTimeOfferId: number;
-  currentMediaFileId: number;
 
   constructor() {
     this.users = new Map();
@@ -169,7 +159,6 @@ export class MemStorage implements IStorage {
     this.blogPosts = new Map();
     this.securityBadges = new Map();
     this.limitedTimeOffers = new Map();
-    this.mediaFiles = new Map();
     
     this.currentUserId = 1;
     this.currentPackageId = 1;
@@ -181,7 +170,6 @@ export class MemStorage implements IStorage {
     this.currentBlogPostId = 1;
     this.currentSecurityBadgeId = 1;
     this.currentLimitedTimeOfferId = 1;
-    this.currentMediaFileId = 1;
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000, // 24 hours
@@ -974,43 +962,6 @@ By implementing these strategies consistently, you'll be well on your way to gro
   async deleteLimitedTimeOffer(id: number): Promise<boolean> {
     return this.limitedTimeOffers.delete(id);
   }
-  
-  // Media Files operations
-  async getMediaFiles(): Promise<MediaFile[]> {
-    return Array.from(this.mediaFiles.values());
-  }
-  
-  async getMediaFilesByUser(userId: number): Promise<MediaFile[]> {
-    return Array.from(this.mediaFiles.values()).filter(
-      (file) => file.uploadedBy === userId
-    );
-  }
-  
-  async getMediaFile(id: number): Promise<MediaFile | undefined> {
-    return this.mediaFiles.get(id);
-  }
-  
-  async createMediaFile(file: InsertMediaFile): Promise<MediaFile> {
-    const id = this.currentMediaFileId++;
-    const now = new Date();
-    
-    const mediaFile: MediaFile = {
-      ...file,
-      id,
-      uploadedAt: now
-    };
-    
-    this.mediaFiles.set(id, mediaFile);
-    return mediaFile;
-  }
-  
-  async deleteMediaFile(id: number): Promise<boolean> {
-    const exists = this.mediaFiles.has(id);
-    if (exists) {
-      this.mediaFiles.delete(id);
-    }
-    return exists;
-  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1452,30 +1403,6 @@ export class DatabaseStorage implements IStorage {
 
   async deleteLimitedTimeOffer(id: number): Promise<boolean> {
     const result = await db.delete(limitedTimeOffers).where(eq(limitedTimeOffers.id, id));
-    return result.count > 0;
-  }
-  
-  // Media Files operations
-  async getMediaFiles(): Promise<MediaFile[]> {
-    return await db.select().from(mediaFiles).orderBy(mediaFiles.uploadedAt, 'desc');
-  }
-  
-  async getMediaFilesByUser(userId: number): Promise<MediaFile[]> {
-    return await db.select().from(mediaFiles).where(eq(mediaFiles.uploadedBy, userId)).orderBy(mediaFiles.uploadedAt, 'desc');
-  }
-  
-  async getMediaFile(id: number): Promise<MediaFile | undefined> {
-    const result = await db.select().from(mediaFiles).where(eq(mediaFiles.id, id)).limit(1);
-    return result[0];
-  }
-  
-  async createMediaFile(file: InsertMediaFile): Promise<MediaFile> {
-    const result = await db.insert(mediaFiles).values(file).returning();
-    return result[0];
-  }
-  
-  async deleteMediaFile(id: number): Promise<boolean> {
-    const result = await db.delete(mediaFiles).where(eq(mediaFiles.id, id));
     return result.count > 0;
   }
 }

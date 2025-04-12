@@ -1,10 +1,7 @@
-import express, { type Express } from "express";
+import type { Express } from "express";
 import { createServer as createHttpServer, type Server } from "http";
 import { createServer as createHttp2Server } from "http2";
 import Stripe from "stripe";
-import multer from "multer";
-import path from "path";
-import fs from "fs";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
@@ -67,14 +64,6 @@ function cacheMiddleware(ttl = 60000) { // Varsayılan olarak 1 dakika
   };
 };
 
-function checkIsAuthenticated(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: "Not authenticated" });
-  }
-  
-  next();
-}
-
 function checkIsAdmin(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ message: "Not authenticated" });
@@ -109,37 +98,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY || "sk_test_dummy";
   const stripe = new Stripe(stripeSecretKey, {
     apiVersion: "2023-10-16",
-  });
-  
-  // Set up file upload storage with multer
-  const uploadStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, "./uploads/media");
-    },
-    filename: (req, file, cb) => {
-      // Generate unique filename with original extension
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      const ext = path.extname(file.originalname);
-      cb(null, uniqueSuffix + ext);
-    }
-  });
-  
-  // File filter to accept only images
-  const fileFilter = (req: any, file: any, cb: any) => {
-    const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
-    if (allowedMimes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Invalid file type. Only JPG, PNG, GIF, WebP and SVG files are allowed.'), false);
-    }
-  };
-  
-  const upload = multer({ 
-    storage: uploadStorage,
-    fileFilter,
-    limits: {
-      fileSize: 5 * 1024 * 1024, // 5MB limit
-    }
   });
 
   // ----- User Routes -----
@@ -655,100 +613,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Error deleting blog post: " + error.message });
     }
   });
-  
-  // ----- Media Files Routes -----
-  
-  // Create uploads directory if it doesn't exist
-  if (!fs.existsSync('./uploads/media')) {
-    fs.mkdirSync('./uploads/media', { recursive: true });
-  }
-  
-  // Upload a media file
-  app.post("/api/media/upload", checkIsAuthenticated, upload.single('file'), async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ message: "No file uploaded" });
-      }
-      
-      const user = req.user as SelectUser;
-      const file = req.file;
-      
-      // Get image dimensions if it's an image
-      let width = null;
-      let height = null;
-      
-      // Create file record in database
-      const mediaFile = await storage.createMediaFile({
-        filename: file.filename,
-        url: `/uploads/media/${file.filename}`,
-        mimeType: file.mimetype,
-        size: file.size,
-        width,
-        height,
-        uploadedBy: user.id
-      });
-      
-      res.status(201).json(mediaFile);
-    } catch (error: any) {
-      console.error("Error uploading file:", error);
-      res.status(500).json({ message: "Error uploading file: " + error.message });
-    }
-  });
-  
-  // Get all media files (admin only)
-  app.get("/api/media", checkIsAdmin, async (req, res) => {
-    try {
-      const files = await storage.getMediaFiles();
-      res.json(files);
-    } catch (error: any) {
-      res.status(500).json({ message: "Error fetching media files: " + error.message });
-    }
-  });
-  
-  // Get media files for current user
-  app.get("/api/media/user", checkIsAuthenticated, async (req, res) => {
-    try {
-      const user = req.user as SelectUser;
-      const files = await storage.getMediaFilesByUser(user.id);
-      res.json(files);
-    } catch (error: any) {
-      res.status(500).json({ message: "Error fetching media files: " + error.message });
-    }
-  });
-  
-  // Delete a media file
-  app.delete("/api/media/:id", checkIsAuthenticated, async (req, res) => {
-    try {
-      const fileId = parseInt(req.params.id);
-      const mediaFile = await storage.getMediaFile(fileId);
-      
-      if (!mediaFile) {
-        return res.status(404).json({ message: "Media file not found" });
-      }
-      
-      // Check if user owns the file or is admin
-      const user = req.user as SelectUser;
-      if (mediaFile.uploadedBy !== user.id && user.role !== 'admin') {
-        return res.status(403).json({ message: "Not authorized to delete this file" });
-      }
-      
-      // Delete file from filesystem
-      const filePath = path.join(process.cwd(), mediaFile.url);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
-      
-      // Delete from database
-      await storage.deleteMediaFile(fileId);
-      
-      res.status(204).end();
-    } catch (error: any) {
-      res.status(500).json({ message: "Error deleting media file: " + error.message });
-    }
-  });
-  
-  // Serve uploaded files
-  app.use('/uploads', express.static('uploads'));
   
   // ----- Security Badges Routes -----
   
